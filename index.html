@@ -270,7 +270,7 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
             <div class="fhead"><h3>ย่านในมาบตาพุด</h3>
               <span><button class="linkbtn" type="button" id="zAll">เลือกทั้งหมด</button> · <button class="linkbtn" type="button" id="zNone">ล้าง</button></span>
             </div>
-            <p class="hint">ร้านที่แหล่งข้อมูลไม่ได้บอกซอยอยู่ในกลุ่ม "ไม่ระบุซอย"</p>
+            <p class="hint">ทุกร้านอยู่ใน ต.มาบตาพุด ร้านที่แหล่งข้อมูลไม่ได้บอกซอยอยู่ในกลุ่ม "ไม่ระบุซอย"</p>
             <div id="zoneChips"></div>
           </div>
           <div class="fgroup">
@@ -386,7 +386,6 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const DISTRICTS=["มาบตาพุด","เมืองระยอง","บ้านฉาง","แกลง","บ้านค่าย","ปลวกแดง","นิคมพัฒนา","เขาชะเมา","วังจันทร์"];
 const DAYS=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
 const PRICES=[{v:1,t:"ต่ำกว่า 100"},{v:2,t:"100–250"},{v:3,t:"250+"}];
 const PRICE_TXT={0:"งบไม่ระบุ",1:"฿ ต่ำกว่า 100",2:"฿฿ 100–250",3:"฿฿฿ 250+"};
@@ -406,7 +405,7 @@ const MODES={
 const LOGO={kao:document.querySelector("#m-kao svg").outerHTML,wan:document.querySelector("#m-wan svg").outerHTML};
 
 const MTP="มาบตาพุด";
-const Z={su:"ถ.สุขุมวิท",so:"ถ.โสภณ / ตลาดโสภณ",ta:"ตลาดมาบตาพุด",my:"มาบยา",rp:"ซ.ร่วมพัฒนา",mall:"โลตัส / เดอะวัน",nf:"หนองแฟบ / เนินพยอม",ns:"เนินสำลี / ทุ่งย่า",tl:"ตลาดลาว / ลานปูน",x:"ไม่ระบุซอย"};
+const Z={su:"ถ.สุขุมวิท",so:"ถ.โสภณ / ตลาดโสภณ",ta:"ตลาดมาบตาพุด",my:"มาบยา",rp:"ซ.ร่วมพัฒนา",mall:"โลตัส / เดอะวัน",nf:"หนองแฟบ / เนินพยอม",ns:"ทุ่งย่า",tl:"ตลาดลาว / ลานปูน",x:"ไม่ระบุซอย"};
 const ZONE_ORDER=[Z.su,Z.so,Z.ta,Z.my,Z.rp,Z.mall,Z.nf,Z.ns,Z.tl,Z.x];
 const K1="ก๋วยเตี๋ยว",K2="ข้าวมันไก่/เป็ดย่าง",K3="ตามสั่ง/จานเดียว",K4="อีสาน/ส้มตำ",K5="ข้าวต้ม/กับข้าว",K6="เหนือ/ใต้",K7="ชาบู/สุกี้/หม่าล่า",K8="ญี่ปุ่น",K9="ทะเล/นานาชาติ";
 const W1="กาแฟ/คาเฟ่",W2="ชานม/ชา",W3="น้ำปั่น/ผลไม้",W4="ไอศกรีม",W5="เบเกอรี/เค้ก",W6="ขนม/ของทานเล่น",W7="บิงซู/หวานเย็น";
@@ -439,7 +438,6 @@ const PRESETS=[
  ["m26","kao","ไอ้อ้วนกะเพราถาด",Z.x,[K3],0,""],
  ["m27","kao","ครัวคุณหน่อยอร่อยทุกอย่าง",Z.x,[K3],0,"มีเมนูมังสวิรัติและทะเล"],
  ["m28","kao","ร้านชวนเมา มาบยาซอย 7",Z.my,[K3,K4],0,""],
- ["m29","kao","อร่อยนอร์ ปตท.36",Z.x,[K3],1,""],
  ["m30","kao","ผัดไทยโบราณ By สุ",Z.x,[K3],1,""],
  ["m31","kao","Meet coffee & อาหารตามสั่งอิสลาม",Z.x,[K3],1,"ตามสั่งฮาลาล มีกาแฟสด"],
  ["m32","kao","ร้านมุสลิมตลาดโสภณ (บังเหมียว)",Z.so,[K3],1,"อาหารฮาลาล"],
@@ -472,12 +470,11 @@ const PRESETS=[
  ["m59","kao","สุกี้ป้าหมวย",Z.so,[K7,K1],1,"โสภณ"],
  ["m60","kao","ตู้หม่าล่า",Z.x,[K7],1,"หม่าล่าชาบูและปิ้งย่าง ไม้ละ 10–15 บาท"],
  ["m61","kao","มาบตาพุดหัวปลาหม้อไฟแอนด์ซีฟู้ด",Z.x,[K9],3,""],
- ["m62","kao","Old Germany",Z.x,[K9],2,"อาหารเยอรมัน"],
+ ["m62","kao","Old Germany",Z.su,[K9],2,"อาหารเยอรมัน ริมถนนสุขุมวิท"],
  ["m63","kao","พริกไทย Bistro",Z.x,[K9,K3],1,""],
  /* ของหวาน & เครื่องดื่ม */
  ["w1","wan","Only me (coffee~food~bake)",Z.my,[W1,W5],1,"มาบยา 12 · กาแฟ ขนม และอาหาร"],
  ["w2","wan","Flare Coffee",Z.so,[W1,W5],2,"ถ.โสภณ ซ.9 · มีห้องแอร์ เค้กอร่อย"],
- ["w3","wan","papa 21 cafe'",Z.ns,[W1],1,"แยกเนินสำลี"],
  ["w4","wan","PangpondBakery&coffee",Z.x,[W5,W1],1,""],
  ["w5","wan","CRENN Artisan Bakery & Cafe",Z.x,[W5,W1],2,""],
  ["w6","wan","Coffee Blossom",Z.x,[W1,W4],1,""],
@@ -554,6 +551,9 @@ if(Array.isArray(S.zones)){ // migrate v1
 }
 delete S.zones;delete S.types;delete S.prices;
 S.custom.forEach(s=>{if(!s.mode) s.mode="kao";});
+/* Map Ta Phut only: drop saved shops, history and exclusions that belong to other areas */
+S.custom=S.custom.filter(s=>s&&s.district===MTP);
+{const ids=new Set(PRESETS.concat(S.custom).map(s=>s.id));S.history=S.history.filter(h=>ids.has(h.id));S.excluded=S.excluded.filter(id=>ids.has(id));}
 if(S.dataVer!==2){S.f={};S.dataVer=2;} // new Map Ta Phut dataset: reset area filters
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
@@ -561,16 +561,14 @@ let mode=(location.hash==="#wan"||location.hash==="#kao")?location.hash.slice(1)
 const todayIdx=new Date().getDay();
 $("today").textContent="วันนี้วัน"+DAYS[todayIdx];
 
-function shops(m){return PRESETS.concat(S.custom).filter(s=>s.mode===(m||mode));}
+function shops(m){return PRESETS.concat(S.custom).filter(s=>s.mode===(m||mode)&&s.district===MTP);}
 function zoneKey(d,z){return d+"|"+z;}
-function dName(d){return d===MTP?"ต."+d:"อ."+d;}
-function place(s){return (s.zone===s.district||s.zone===Z.x)?dName(s.district):s.zone+" · "+dName(s.district);}
+function place(s){return (s.zone===MTP||s.zone===Z.x)?"มาบตาพุด (ไม่ระบุซอย)":s.zone;}
 function zonesOf(m){
   const map=new Map();
   shops(m).forEach(s=>{if(!map.has(s.district)) map.set(s.district,new Set());map.get(s.district).add(s.zone);});
-  const ord=d=>{const i=DISTRICTS.indexOf(d);return i<0?99:i;};
   const zo=z=>{const i=ZONE_ORDER.indexOf(z);return i<0?50:i;};
-  return [...map.entries()].sort((a,b)=>ord(a[0])-ord(b[0])).map(([d,z])=>({d,z:[...z].sort((p,q)=>zo(p)-zo(q))}));
+  return [...map.entries()].map(([d,z])=>({d,z:[...z].sort((p,q)=>zo(p)-zo(q))}));
 }
 function zoneKeysOf(m){return zonesOf(m).flatMap(g=>g.z.map(z=>zoneKey(g.d,z)));}
 function F(m){
@@ -613,12 +611,6 @@ function renderZones(){
   shops().forEach(s=>{if(!S.excluded.includes(s.id)){const k=zoneKey(s.district,s.zone);counts[k]=(counts[k]||0)+1;}});
   zonesOf().forEach(g=>{
     const div=document.createElement("div");div.className="district";
-    const lab=document.createElement("button");lab.type="button";lab.className="dlabel";lab.textContent=dName(g.d);
-    lab.addEventListener("click",()=>{
-      const keys=g.z.map(z=>zoneKey(g.d,z)),allOn=keys.every(k=>sel.has(k));
-      f.zones=allOn?f.zones.filter(k=>!keys.includes(k)):[...new Set(f.zones.concat(keys))];update();
-    });
-    div.appendChild(lab);
     const chips=document.createElement("div");chips.className="chips";
     g.z.forEach(z=>{const k=zoneKey(g.d,z);
       chips.appendChild(chip(z,sel.has(k),()=>{f.zones=sel.has(k)?f.zones.filter(x=>x!==k):f.zones.concat(k);update();},counts[k]||0));});
@@ -772,7 +764,7 @@ function spin(){
   }
   requestAnimationFrame(step);
 }
-function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.name+" "+((s.zone===s.district||s.zone===Z.x)?"":s.zone+" ")+s.district+" ระยอง");}
+function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.name+" "+((s.zone===MTP||s.zone===Z.x)?"":s.zone+" ")+"มาบตาพุด ระยอง");}
 function metaTags(box,s){
   box.innerHTML="";
   const add=t=>{const e=document.createElement("span");e.className="tag";e.textContent=t;box.appendChild(e);};
@@ -848,7 +840,7 @@ function renderList(){
   groups.forEach(g=>{
     const list=shops().filter(s=>s.district===g.d&&s.zone===g.z);
     const blk=document.createElement("div");blk.className="zone-block";
-    const h=document.createElement("p");h.className="zone-title";h.textContent=(g.z===g.d?dName(g.d):g.z+" · "+dName(g.d))+" ("+list.length+")";blk.appendChild(h);
+    const h=document.createElement("p");h.className="zone-title";h.textContent=g.z+" ("+list.length+")";blk.appendChild(h);
     list.forEach(s=>{
       const row=document.createElement("div");row.className="shop"+(ex.has(s.id)?" off":"");
       const cb=document.createElement("input");cb.type="checkbox";cb.id="cb-"+s.id;cb.checked=!ex.has(s.id);
@@ -890,9 +882,8 @@ function renderForm(){
   renderZoneList();
 }
 function renderZoneList(){
-  const d=MTP,dl=$("zoneList");dl.innerHTML="";
-  const set=new Set();["kao","wan"].forEach(m=>{const g=zonesOf(m).find(x=>x.d===d);if(g) g.z.forEach(z=>set.add(z));});
-  if(!set.size) set.add(d);
+  const dl=$("zoneList");dl.innerHTML="";
+  const set=new Set(ZONE_ORDER);["kao","wan"].forEach(m=>zonesOf(m).forEach(g=>g.z.forEach(z=>set.add(z))));
   set.forEach(z=>{const o=document.createElement("option");o.value=z;dl.appendChild(o);});
 }
 $("addForm").addEventListener("submit",e=>{
@@ -911,7 +902,7 @@ $("addForm").addEventListener("submit",e=>{
 
 /* ---------- import / export ---------- */
 function refreshExport(){
-  $("exportBox").value=JSON.stringify(S.custom.map(s=>({name:s.name,mode:s.mode,district:s.district,zone:s.zone,types:s.types,price:s.price,note:s.note,closed:s.closed})));
+  $("exportBox").value=JSON.stringify(S.custom.map(s=>({name:s.name,mode:s.mode,zone:s.zone,types:s.types,price:s.price,note:s.note,closed:s.closed})));
 }
 $("copyBtn").addEventListener("click",()=>{
   const v=$("exportBox").value,m=$("ioMsg");
@@ -927,7 +918,7 @@ $("importBtn").addEventListener("click",()=>{
     arr.forEach((r,i)=>{
       if(!r||typeof r.name!=="string"||!r.name.trim()) return;
       const md=r.mode==="wan"?"wan":"kao";
-      const district=typeof r.district==="string"&&r.district?r.district:MTP;
+      const district=MTP;
       const zone=typeof r.zone==="string"&&r.zone?r.zone:Z.x;
       if(S.custom.some(s=>s.name===r.name&&s.zone===zone&&s.mode===md)) return;
       const types=Array.isArray(r.types)?r.types.filter(t=>MODES[md].types.includes(t)):[];
