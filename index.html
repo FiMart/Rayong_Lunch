@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>เที่ยงนี้กินไหน ระยอง</title>
+<title>เที่ยงนี้กินไหน มาบตาพุด</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@500;600&family=Anuphan:wght@400;500;600&display=swap" rel="stylesheet">
@@ -211,7 +211,7 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
     <div class="brand">
       <div class="logo" aria-hidden="true" id="logo"></div>
       <div>
-        <h1 id="title">เที่ยงนี้กินไหน <span>ระยอง</span></h1>
+        <h1 id="title">เที่ยงนี้กินไหน <span>มาบตาพุด</span></h1>
         <p class="sub" id="sub"></p>
       </div>
     </div>
@@ -223,7 +223,7 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
         </button>
         <button class="mode" type="button" data-m="wan" id="m-wan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 11h9L12 21.5Z"/><path d="M7 11a5 5 0 0 1 10 0"/><circle cx="12" cy="4.3" r="1.2" fill="currentColor"/></svg>
-          <span>ของหวาน</span><span class="cnt" id="c-wan"></span>
+          <span>หวาน &amp; น้ำปั่น</span><span class="cnt" id="c-wan"></span>
         </button>
       </nav>
       <div class="today" id="today"></div>
@@ -267,10 +267,10 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
         <div class="filters-body" id="filtersBody">
           <h2 class="fh" id="filter-h">วงล้อสุ่มจากร้านไหนบ้าง</h2>
           <div class="fgroup">
-            <div class="fhead"><h3>ย่าน / อำเภอ</h3>
+            <div class="fhead"><h3>ย่านในมาบตาพุด</h3>
               <span><button class="linkbtn" type="button" id="zAll">เลือกทั้งหมด</button> · <button class="linkbtn" type="button" id="zNone">ล้าง</button></span>
             </div>
-            <p class="hint">กดชื่ออำเภอเพื่อเลือกหรือยกเลิกทั้งอำเภอ</p>
+            <p class="hint">ร้านที่แหล่งข้อมูลไม่ได้บอกซอยอยู่ในกลุ่ม "ไม่ระบุซอย"</p>
             <div id="zoneChips"></div>
           </div>
           <div class="fgroup">
@@ -321,16 +321,10 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
               <label for="fName">ชื่อร้าน</label>
               <input type="text" id="fName" placeholder="เช่น ข้าวแกงป้าหน้าโรงงาน" required>
             </div>
-            <div class="two">
-              <div class="field">
-                <label for="fDistrict">อำเภอ</label>
-                <select id="fDistrict"></select>
-              </div>
-              <div class="field">
-                <label for="fZone">ย่าน (ใช้เป็นตัวกรองของวงล้อ)</label>
-                <input type="text" id="fZone" list="zoneList" placeholder="เช่น มาบตาพุด, หน้านิคมฯ">
-                <datalist id="zoneList"></datalist>
-              </div>
+            <div class="field">
+              <label for="fZone">ย่านในมาบตาพุด (ใช้เป็นตัวกรองของวงล้อ)</label>
+              <input type="text" id="fZone" list="zoneList" placeholder="เช่น ถ.สุขุมวิท, มาบยา, หน้านิคมฯ">
+              <datalist id="zoneList"></datalist>
             </div>
             <fieldset class="field">
               <legend>ประเภท (เลือกได้หลายอย่าง)</legend>
@@ -369,7 +363,7 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
             <div class="actions"><button class="btn sm" type="button" id="copyBtn">คัดลอก</button></div>
             <div class="field" style="margin-top:10px">
               <label for="importBox">วางข้อมูลเพื่อนำเข้า</label>
-              <textarea id="importBox" placeholder='[{"name":"...","mode":"kao","district":"...","zone":"..."}]'></textarea>
+              <textarea id="importBox" placeholder='[{"name":"...","mode":"kao","zone":"..."}]'></textarea>
             </div>
             <div class="actions"><button class="btn sm" type="button" id="importBtn">นำเข้า</button></div>
             <p class="ok" id="ioMsg" role="status"></p>
@@ -385,74 +379,170 @@ textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px
     </div>
   </main>
 
-  <p class="foot">รายชื่อร้านตั้งต้นรวบรวมจากรีวิวและบทความบน <a href="https://www.wongnai.com/listings/restaurant-rayong" target="_blank" rel="noopener">Wongnai</a> และ <a href="https://www.matichon.co.th/lifestyle/food-travel/news_5748914" target="_blank" rel="noopener">มติชน</a> (พ.ย. 2569) เวลาเปิด-ปิดและวันหยุดอาจเปลี่ยน ควรเช็กก่อนออกเดินทาง ร้านที่เพิ่มเอง การตัดร้าน และประวัติ จะจำไว้ในเบราว์เซอร์เครื่องนี้</p>
+  <p class="foot">รายชื่อร้านในมาบตาพุดรวบรวมจากหมวด <a href="https://www.wongnai.com/regions/878-%E0%B8%A1%E0%B8%B2%E0%B8%9A%E0%B8%95%E0%B8%B2%E0%B8%9E%E0%B8%B8%E0%B8%94/restaurants?regions=878" target="_blank" rel="noopener">ร้านอาหารในมาบตาพุด บน Wongnai</a> และรีวิวบน Lemon8 (พ.ย. 2569) ร้านเล็กหรือร้านเปิดใหม่อาจยังไม่อยู่ในรายชื่อ เพิ่มเองได้ในแท็บ "เพิ่มร้านของฉัน" เวลาเปิด-ปิดและวันหยุดอาจเปลี่ยน ควรเช็กก่อนออกเดินทาง ร้านที่เพิ่มเอง การตัดร้าน และประวัติ จะจำไว้ในเบราว์เซอร์เครื่องนี้</p>
 </div>
 
 <script>
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const DISTRICTS=["เมืองระยอง","บ้านฉาง","แกลง","บ้านค่าย","ปลวกแดง","นิคมพัฒนา","เขาชะเมา","วังจันทร์"];
+const DISTRICTS=["มาบตาพุด","เมืองระยอง","บ้านฉาง","แกลง","บ้านค่าย","ปลวกแดง","นิคมพัฒนา","เขาชะเมา","วังจันทร์"];
 const DAYS=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
 const PRICES=[{v:1,t:"ต่ำกว่า 100"},{v:2,t:"100–250"},{v:3,t:"250+"}];
 const PRICE_TXT={0:"งบไม่ระบุ",1:"฿ ต่ำกว่า 100",2:"฿฿ 100–250",3:"฿฿฿ 250+"};
 
 const MODES={
-  kao:{label:"ของคาว",title:'เที่ยงนี้กินไหน <span>ระยอง</span>',sub:"เลือกย่าน เลือกของที่อยากกิน แล้วให้วงล้อตัดสินใจแทน",
+  kao:{label:"ของคาว",title:'เที่ยงนี้กินไหน <span>มาบตาพุด</span>',sub:"สุ่มเฉพาะร้านในมาบตาพุด เลือกย่านและของที่อยากกิน แล้วให้วงล้อตัดสินใจแทน",
     eyebrow:"เที่ยงนี้ไปร้านนี้",typeHead:"อยากกินแนวไหน",
-    types:["ก๋วยเตี๋ยว","ตามสั่ง/จานเดียว","ข้าวมันไก่/ข้าวแกง","อาหารทะเล","อีสาน/ส้มตำ","อาหารไทย/พื้นบ้าน","ญี่ปุ่น"],
+    types:["ก๋วยเตี๋ยว","ข้าวมันไก่/เป็ดย่าง","ตามสั่ง/จานเดียว","อีสาน/ส้มตำ","ข้าวต้ม/กับข้าว","เหนือ/ใต้","ชาบู/สุกี้/หม่าล่า","ญี่ปุ่น","ทะเล/นานาชาติ"],
     colors:["#0d3a4a","#de4f28","#eea532","#21877b","#b3261e","#58704a"],dark:{"#eea532":1},
     ring:"#0b3440",bulb:"#ffd166"},
-  wan:{label:"ของหวาน",title:'ของหวานร้านไหนดี <span>ระยอง</span>',sub:"กินข้าวเสร็จแล้วต่อของหวานร้านไหน ให้วงล้อเลือกให้",
-    eyebrow:"ของหวานวันนี้",typeHead:"อยากกินหวานแบบไหน",
-    types:["ขนมไทย","บิงซู/น้ำแข็งไส","เค้ก/เบเกอรี","คาเฟ่","ไอศกรีม","เครื่องดื่ม/ชานม"],
+  wan:{label:"หวาน & น้ำปั่น",title:'ของหวาน น้ำปั่น <span>มาบตาพุด</span>',sub:"กินข้าวเสร็จแล้วต่อของหวาน กาแฟ ชานม หรือน้ำปั่นร้านไหน ให้วงล้อเลือกให้",
+    eyebrow:"ของหวาน/เครื่องดื่มวันนี้",typeHead:"อยากได้แบบไหน",
+    types:["กาแฟ/คาเฟ่","ชานม/ชา","น้ำปั่น/ผลไม้","ไอศกรีม","เบเกอรี/เค้ก","ขนม/ของทานเล่น","บิงซู/หวานเย็น"],
     colors:["#d43f78","#f7c3d5","#86204f","#86d3bd","#f4be66","#b994de"],dark:{"#f7c3d5":1,"#86d3bd":1,"#f4be66":1,"#b994de":1},
     ring:"#5c1638",bulb:"#fff1a8"}
 };
 const LOGO={kao:document.querySelector("#m-kao svg").outerHTML,wan:document.querySelector("#m-wan svg").outerHTML};
 
-const R1="เมืองระยอง";
+const MTP="มาบตาพุด";
+const Z={su:"ถ.สุขุมวิท",so:"ถ.โสภณ / ตลาดโสภณ",ta:"ตลาดมาบตาพุด",my:"มาบยา",rp:"ซ.ร่วมพัฒนา",mall:"โลตัส / เดอะวัน",nf:"หนองแฟบ / เนินพยอม",ns:"เนินสำลี / ทุ่งย่า",tl:"ตลาดลาว / ลานปูน",x:"ไม่ระบุซอย"};
+const ZONE_ORDER=[Z.su,Z.so,Z.ta,Z.my,Z.rp,Z.mall,Z.nf,Z.ns,Z.tl,Z.x];
+const K1="ก๋วยเตี๋ยว",K2="ข้าวมันไก่/เป็ดย่าง",K3="ตามสั่ง/จานเดียว",K4="อีสาน/ส้มตำ",K5="ข้าวต้ม/กับข้าว",K6="เหนือ/ใต้",K7="ชาบู/สุกี้/หม่าล่า",K8="ญี่ปุ่น",K9="ทะเล/นานาชาติ";
+const W1="กาแฟ/คาเฟ่",W2="ชานม/ชา",W3="น้ำปั่น/ผลไม้",W4="ไอศกรีม",W5="เบเกอรี/เค้ก",W6="ขนม/ของทานเล่น",W7="บิงซู/หวานเย็น";
 const PRESETS=[
- ["p1","kao","ก๋วยเตี๋ยวเส้นปลา เกี๊ยวปลา เจ๊จิ๋ม",R1,"ตัวเมือง",["ก๋วยเตี๋ยว"],1,"ถ.ตากสิน · เกี๊ยวปลา เส้นปลา · เปิดถึงราว 16:00"],
- ["p2","kao","ขาหมู หมูกรอบ วัดลุ่ม",R1,"ตัวเมือง",["ข้าวมันไก่/ข้าวแกง"],1,"ย่านวัดลุ่ม"],
- ["p3","kao","นุ้ยข้าวขาหมูโอวัลติน",R1,"ตัวเมือง",["ข้าวมันไก่/ข้าวแกง"],1,"ย่านกรอกยายชา · ราว 06:00–18:00"],
- ["p4","kao","Fin Sushi Rayong แยกบ้านดอน",R1,"ตัวเมือง",["ญี่ปุ่น"],3,"แยกบ้านดอน"],
- ["p6","kao","กระเพราในแคมป์ (เจ้อ้วน)",R1,"ตัวเมือง",["ตามสั่ง/จานเดียว"],1,"ซ.ลุงคล้อย ท่าประดู่ · รับทำข้าวกล่อง"],
- ["p7","kao","กระเพราลุงหนวด",R1,"เชิงเนิน / เนินพระ",["ตามสั่ง/จานเดียว"],1,"ย่านศักดิ์สายธาร เชิงเนิน"],
- ["p8","kao","ก๋วยจั๊บญวนอุบลเส้นสด ไข่กระทะ",R1,"เชิงเนิน / เนินพระ",["ก๋วยเตี๋ยว"],1,"ต.เชิงเนิน · เปิดถึงราว 17:00"],
- ["p9","kao","ครัวบ้านฉัน-ข้าวหน้าล้น",R1,"เชิงเนิน / เนินพระ",["ตามสั่ง/จานเดียว"],1,"ถ.สุขุมวิท เนินพระ · ฟรีไข่ดาว · มีเดลิเวอรี"],
- ["p10","kao","แหลมเจริญซีฟู้ด",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล"],3,"ถ.เลียบชายฝั่ง แถวหาดแสงจันทร์ · ปลากะพงทอดน้ำปลา"],
- ["p11","kao","เจ๊อึ่ง ซีฟู้ด หาดแม่รำพึง",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล"],3,"หาดแม่รำพึง"],
- ["p12","kao","บ้านครัวประมง",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล","อาหารไทย/พื้นบ้าน"],3,"หาดแม่รำพึง"],
- ["p13","kao","ครัวปากน้ำ",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล","อาหารไทย/พื้นบ้าน"],2,"ข้าวผัดครัวปากน้ำ · ห่อหมกปลา"],
- ["p14","kao","ข้าวมันไก่ วงเวียนปลาโลมา",R1,"มาบตาพุด",["ข้าวมันไก่/ข้าวแกง"],1,"แยกหนองแฟบ · รถเข็น ขายข้าวมันไก่อย่างเดียว"],
- ["p15","kao","ก๋วยเตี๋ยวเป็ดตุ๋น ร้านธรรมดา",R1,"มาบตาพุด",["ก๋วยเตี๋ยว"],1,"หัวมุม ถ.โสภณ 2 · เปิดราว 11:30"],
- ["p16","kao","ห่อหมกป้าจิ๋วบ้านเพ",R1,"บ้านเพ",["อาหารไทย/พื้นบ้าน"],2,"บ้านเพ"],
- ["p17","kao","เจ๊ต่าย ปูเป็น สาขาบ้านเพ",R1,"บ้านเพ",["อาหารทะเล"],2,"บ้านเพ"],
- ["p18","kao","ส้มตำ ซุ้มบ้านสวน",R1,"บ้านเพ",["อีสาน/ส้มตำ"],1,"ต.เพ · เปิดถึงราว 22:00"],
- ["p19","kao","ป้าตุ่มก๋วยเตี๋ยวแกงส้ม","บ้านฉาง","บ้านฉาง",["ก๋วยเตี๋ยว","ข้าวมันไก่/ข้าวแกง"],1,"ตัวเมืองบ้านฉาง · เปิดเช้าถึงบ่ายสามกว่า"],
- ["p20","kao","มธุรสโภชนา","บ้านฉาง","บ้านฉาง",["ตามสั่ง/จานเดียว"],2,"บ้านฉาง"],
- ["p22","kao","เกี๊ยวปลานายเคี้ยม","แกลง","แกลง",["ก๋วยเตี๋ยว"],1,"ร้านเก่ากว่า 60 ปี · เกี๊ยวปลา เกี๊ยวกุ้ง"],
- ["p23","kao","ครัวครูบุษบา ผัดไทยกุ้งสด","แกลง","แกลง",["ตามสั่ง/จานเดียว"],1,"ต.วังหว้า ริม ถ.สุขุมวิท · เปิดถึงราว 16:00",4],
- ["p24","kao","มาเด้อข้าวแกง","แกลง","แกลง",["ข้าวมันไก่/ข้าวแกง"],1,"แกลง"],
- ["p25","kao","ครัว 3 ย่าน แกลง","แกลง","แกลง",["อาหารไทย/พื้นบ้าน"],2,"แกลง"],
- ["p26","kao","มหาสมุทรซีฟู้ด","แกลง","แกลง",["อาหารทะเล"],0,"กุ้งแช่น้ำปลา"],
- ["p27","kao","ร้านอาหารกุ๊กกิ๊กทัวร์","แกลง","ริมเพ / แหลมแม่พิมพ์",["ตามสั่ง/จานเดียว","อาหารทะเล"],1,"ตรงข้ามโนโวเทล ริมเพ · ข้าวต้มทะเล"],
- ["p28","kao","ครัวทะเลซีฟู้ด หาดแหลมแม่พิมพ์","แกลง","ริมเพ / แหลมแม่พิมพ์",["อาหารทะเล"],3,"หาดแหลมแม่พิมพ์"],
- ["p29","kao","ปลาดุกป้าฑา","บ้านค่าย","บ้านค่าย",["อาหารไทย/พื้นบ้าน"],0,"ซ.วัดบ้านค่าย · เปิดมาราว 60 ปี · เมนูปลาดุก"],
- ["p30","kao","รัชนีตามสั่ง","บ้านค่าย","บ้านค่าย",["ตามสั่ง/จานเดียว"],1,"ข้างสำนักงานที่ดินบ้านค่าย · ถึงราว 15:30"],
- ["p31","kao","ร้านตำเอ็นใหญ่ (Tum Engineer)","ปลวกแดง","ปลวกแดง",["อีสาน/ส้มตำ"],1,"ราว 08:30–20:30"],
- /* ของหวาน */
- ["d1","wan","ร้านขนมหวานสะพานไม้",R1,"ตัวเมือง",["ขนมไทย"],1,"ถ.ราษฎร์บำรุง · ขนมหวานแบบไทย · เปิดถึงราว 15:00"],
- ["d2","wan","ญาจินดม คาเฟ่ขนมไทย",R1,"ตัวเมือง",["ขนมไทย","คาเฟ่"],1,"ต้นซอยยมจินดา · อินทนิล ขนมโค · ติดแอร์"],
- ["d3","wan","At Ease Sweet & Eatery",R1,"ตัวเมือง",["คาเฟ่","เค้ก/เบเกอรี"],2,"ถ.ราชชุมพล · เปิดราว 10:30"],
- ["p5","wan","Cafe Kantary Rayong",R1,"ตัวเมือง",["คาเฟ่","เค้ก/เบเกอรี"],2,"ริม ถ.สุขุมวิท"],
- ["d4","wan","ร้านเค้ก-อ้อมกอดเค้ก",R1,"เชิงเนิน / เนินพระ",["เค้ก/เบเกอรี"],0,"ถ.กรอกยายชา เนินพระ · เปิดถึงราว 22:00"],
- ["p21","wan","กาแฟท่าพระจันทร์ คอฟฟี่ แอนด์ คิทเช่น","บ้านฉาง","บ้านฉาง",["คาเฟ่","เค้ก/เบเกอรี"],2,"หมู่บ้านเดอะลิฟวิ่ง · เปิดถึงราว 17:00"],
- ["d5","wan","ศิลา คอฟฟี่","แกลง","แกลง",["คาเฟ่","เค้ก/เบเกอรี"],1,"ริม ถ.สุขุมวิท · เค้กหลายเมนู ลาวา"],
- ["d6","wan","แกลงกร่ำกาแฟสด","แกลง","ริมเพ / แหลมแม่พิมพ์",["คาเฟ่","เค้ก/เบเกอรี"],0,"ทางไปโนโวเทล ริมเพ · กาแฟและเบเกอรี"],
- ["d7","wan","หลักกิโลคอฟฟี่","ปลวกแดง","ปลวกแดง",["เครื่องดื่ม/ชานม"],0,"ชาไทยวิปชีส"]
-].map(a=>({id:a[0],mode:a[1],name:a[2],district:a[3],zone:a[4],types:a[5],price:a[6],note:a[7],closed:(a[8]===undefined?null:a[8])}));
+ ["m1","kao","ก๋วยเตี๋ยวเป็ดตุ๋น ร้านธรรมดา",Z.so,[K1],2,"หัวมุม ถ.โสภณ 2 · เปิดราว 11:30 · เกาเหลาเป็ด อะหลั่ยเป็ด น้ำเก๊กฮวย"],
+ ["m2","kao","ก๋วยเตี๋ยวไข่ต้ม",Z.x,[K1,K3],1,"บะหมี่หมูต้มยำแห้งไข่ต้ม"],
+ ["m3","kao","ก๋วยเตี๋ยวหมูตุ๋นหม้อไฟนินจา",Z.x,[K1],1,"หมูตุ๋นนุ่ม อิ่มไว เหมาะมื้อเที่ยง"],
+ ["m4","kao","ธัญรส มาบตาพุด เจ้าเก่าดั้งเดิม",Z.x,[K1],1,"ลูกชิ้นเอ็นลวก เนื้อสดลวก"],
+ ["m5","kao","ก๋วยเตี๋ยวลูกชิ้นปลาเจ้แอน",Z.x,[K1],1,""],
+ ["m6","kao","ก๋วยเตี๋ยวดู๋ดี๋",Z.x,[K1],1,"เมืองใหม่มาบตาพุด"],
+ ["m7","kao","เฉลียว ก๋วยเตี๋ยวเรืออยุธยา",Z.x,[K1],1,""],
+ ["m8","kao","บ้านก๋วยเตี๋ยวผักหวาน (สาขามาบตาพุด)",Z.x,[K1,K3],1,""],
+ ["m9","kao","บะหมี่เกี๊ยวซอยร่วมพัฒนา (เจ้าเก่า)",Z.rp,[K1],1,""],
+ ["m10","kao","Bar Mee บาร์หมี่",Z.x,[K1],0,""],
+ ["m11","kao","นิยมเส้น ก๋วยเตี๋ยวไก่ตุ๋น & ขนมจีนน้ำยาใต้",Z.x,[K1,K3],1,"จานใหญ่ เมนูเยอะ · ข้าวยำไก่แซ่บ · น้ำแข็ง ผักฟรี"],
+ ["m12","kao","คุณสำเริงขายทุกอย่าง",Z.so,[K1,K3],1,"โสภณ"],
+ ["m13","kao","ข้าวมันไก่ วงเวียนปลาโลมา",Z.nf,[K2],1,"แยกหนองแฟบ · รถเข็น ขายข้าวมันไก่อย่างเดียว"],
+ ["m14","kao","ข้าวมันไก่เบตง สาขา 2",Z.x,[K2],1,""],
+ ["m15","kao","แป๊ะข้าวมันไก่",Z.x,[K2],0,"ติดร้านผู้ชายขายหอย · ถึงราว 17:00"],
+ ["m16","kao","ข้าวมันไก่ หน้าเซเว่นซอยร่วม",Z.rp,[K2],0,""],
+ ["m17","kao","ร้านข้าวมันไก่ ถ.หน้าวัด",Z.x,[K2],1,"ถ.หน้าวัด"],
+ ["m18","kao","ฉลองรส ข้าวมันไก่",Z.x,[K2],1,"สาขามาบตาพุด"],
+ ["m19","kao","หอมมันไก่",Z.x,[K2],0,"ข้าวมันไก่สิงคโปร์ · ราว 10:00–19:00"],
+ ["m20","kao","Mr.ซัน ข้าวมันไก่ บะกุ๊ดเต๋",Z.x,[K2],0,"ข้าวอบกระเทียม ซี่โครงหมูนุ่ม"],
+ ["m21","kao","เป็ดย่างนายอ๊อด",Z.x,[K2],2,""],
+ ["m22","kao","นานา",Z.x,[K3],1,"ไก่สับจานใหญ่"],
+ ["m23","kao","เจ๊นิดตามสั่ง สาขา 2",Z.x,[K3],0,""],
+ ["m24","kao","ลิ้มม่งฮวด",Z.x,[K3],2,""],
+ ["m25","kao","ร้านข้าวสุ๑๐๐๐",Z.x,[K3],1,"ข้าวกล่อง"],
+ ["m26","kao","ไอ้อ้วนกะเพราถาด",Z.x,[K3],0,""],
+ ["m27","kao","ครัวคุณหน่อยอร่อยทุกอย่าง",Z.x,[K3],0,"มีเมนูมังสวิรัติและทะเล"],
+ ["m28","kao","ร้านชวนเมา มาบยาซอย 7",Z.my,[K3,K4],0,""],
+ ["m29","kao","อร่อยนอร์ ปตท.36",Z.x,[K3],1,""],
+ ["m30","kao","ผัดไทยโบราณ By สุ",Z.x,[K3],1,""],
+ ["m31","kao","Meet coffee & อาหารตามสั่งอิสลาม",Z.x,[K3],1,"ตามสั่งฮาลาล มีกาแฟสด"],
+ ["m32","kao","ร้านมุสลิมตลาดโสภณ (บังเหมียว)",Z.so,[K3],1,"อาหารฮาลาล"],
+ ["m33","kao","ครัวชุมชน (เจ๊เตี้ย)",Z.x,[K5],1,""],
+ ["m34","kao","ร้านไอ้หนูยอดผัก",Z.x,[K5],1,""],
+ ["m35","kao","ไผ่หอม",Z.x,[K5],1,""],
+ ["m36","kao","ข้าวต้มวิเชียร",Z.x,[K5],1,""],
+ ["m37","kao","ร้านข้าวต้มกุ๊ยสุพรรณบุรี",Z.x,[K5],1,""],
+ ["m38","kao","รักการดี",Z.ta,[K4],2,"เลยสถานีตำรวจมานิด · ไก่ทอด ส้มตำ · เที่ยงคนเยอะ โทรจองก่อน"],
+ ["m39","kao","ตำนานไห",Z.x,[K4],2,""],
+ ["m40","kao","ร้านมะลิส้มตำ",Z.x,[K4,K1],2,""],
+ ["m41","kao","ส้มตำปากหมา",Z.x,[K4],2,"ร้านริมน้ำ"],
+ ["m42","kao","ร้านลาบหนองบัวฯ",Z.x,[K4],0,""],
+ ["m43","kao","ส้มตำผู้ชายขายหอย",Z.x,[K4],0,"สาขาระยอง"],
+ ["m44","kao","ยำแซ่บๆ By เชฟหนุ่ม",Z.x,[K4],1,""],
+ ["m45","kao","ร้านลาบจาวเหนือ",Z.x,[K4,K6],1,""],
+ ["m46","kao","ไก่หุบบอน & คอฟฟี่",Z.x,[K4],0,"สาขามาบตาพุด"],
+ ["m47","kao","4 เด้ง ผัดตำยำแซ่บ",Z.x,[K4],0,"ใกล้ดูโฮม · 10:00–15:00 และ 17:00–23:00"],
+ ["m48","kao","กาฬสินธุ์แจ่วฮ้อน by Keeky",Z.x,[K4],0,""],
+ ["m49","kao","ยำ ยัน หอย",Z.x,[K4,K9],0,""],
+ ["m50","kao","ร้านข้าวซอยแม่ชัญญา",Z.x,[K6],1,""],
+ ["m51","kao","ข้าวซอย ขนมจีนน้ำเงี้ยว (ไก่แก้วกิ๋นลำ)",Z.x,[K6],0,"ก๋วยเตี๋ยวลูกทุ่งลำปาง"],
+ ["m52","kao","ร้านแกงใต้เมืองลุง (เฌอลิณญ์)",Z.x,[K6],0,""],
+ ["m53","kao","ร้านแกงใต้ลูกนายยก",Z.x,[K6],0,""],
+ ["m54","kao","wiith love katsu",Z.x,[K8],2,""],
+ ["m55","kao","ICHIN ร้านอาหารญี่ปุ่น",Z.x,[K8],0,"สาขามาบตาพุด"],
+ ["m56","kao","ใครไม่ซ่าเกี๊ยวซ่า",Z.x,[K8],0,""],
+ ["m57","kao","แซลม่อน ละมุนแซลม่อน",Z.x,[K8],0,""],
+ ["m58","kao","MK โลตัส มาบตาพุด",Z.mall,[K7],3,""],
+ ["m59","kao","สุกี้ป้าหมวย",Z.so,[K7,K1],1,"โสภณ"],
+ ["m60","kao","ตู้หม่าล่า",Z.x,[K7],1,"หม่าล่าชาบูและปิ้งย่าง ไม้ละ 10–15 บาท"],
+ ["m61","kao","มาบตาพุดหัวปลาหม้อไฟแอนด์ซีฟู้ด",Z.x,[K9],3,""],
+ ["m62","kao","Old Germany",Z.x,[K9],2,"อาหารเยอรมัน"],
+ ["m63","kao","พริกไทย Bistro",Z.x,[K9,K3],1,""],
+ /* ของหวาน & เครื่องดื่ม */
+ ["w1","wan","Only me (coffee~food~bake)",Z.my,[W1,W5],1,"มาบยา 12 · กาแฟ ขนม และอาหาร"],
+ ["w2","wan","Flare Coffee",Z.so,[W1,W5],2,"ถ.โสภณ ซ.9 · มีห้องแอร์ เค้กอร่อย"],
+ ["w3","wan","papa 21 cafe'",Z.ns,[W1],1,"แยกเนินสำลี"],
+ ["w4","wan","PangpondBakery&coffee",Z.x,[W5,W1],1,""],
+ ["w5","wan","CRENN Artisan Bakery & Cafe",Z.x,[W5,W1],2,""],
+ ["w6","wan","Coffee Blossom",Z.x,[W1,W4],1,""],
+ ["w7","wan","Porto Maeto (พ่อโต แม่โต คอฟฟี่)",Z.x,[W1],1,""],
+ ["w8","wan","How Long Coffee",Z.x,[W1],1,""],
+ ["w9","wan","Early Bird Coffee Roaster",Z.x,[W1],0,""],
+ ["w10","wan","U Cup coffee",Z.x,[W1],0,""],
+ ["w11","wan","THUNG YA ทุ่งย่า coffee",Z.ns,[W1],0,"ตรงข้ามเยื้องปั๊มเชลล์ SPRC"],
+ ["w12","wan","PunThai Coffee เดอะวัน",Z.mall,[W1],0,""],
+ ["w13","wan","ร.เรือ Chapter Maptaphut",Z.x,[W1],1,"ร้านเล็กในซอย ติดแอร์ · Black Orange · เปิด 07:00"],
+ ["w14","wan","Unicorn Café",Z.x,[W1],0,"เปิด 07:00"],
+ ["w15","wan","คิมคอฟฟี่ (KIIM KOFFEE)",Z.x,[W1,W2],1,"ชาเขียวเย็น/ปั่น · เครปเค้ก"],
+ ["w16","wan","สุขเสมอ Coffee",Z.su,[W1,W5],0,"ติด ถ.สุขุมวิท · ราว 07:30–16:00"],
+ ["w17","wan","สวนขวัญคาเฟ่",Z.su,[W1],1,"128 ถ.สุขุมวิท · ถึงราว 17:00"],
+ ["w18","wan","Saturn Coffee",Z.x,[W1,W5],1,""],
+ ["w19","wan","Clinic Coffee",Z.x,[W1,W3,W4],1,"มาบตาพุด center"],
+ ["w20","wan","อิ่มสบายคาเฟ่",Z.x,[W1],0,"มีคาร์แคร์ในร้าน"],
+ ["w21","wan","Argent Coffee & Bakery",Z.x,[W5,W1],0,""],
+ ["w22","wan","ลัลลาบาย",Z.x,[W5,W1],1,""],
+ ["w23","wan","Grandma house",Z.x,[W1],0,""],
+ ["w24","wan","Double P master coffee",Z.x,[W1,W2],0,""],
+ ["w25","wan","Lucky One Cafe",Z.x,[W3,W1],1,"ทางเข้าวัดมาบตาพุด"],
+ ["w26","wan","ครัวนพล",Z.x,[W3],0,"เครื่องดื่ม/น้ำผลไม้"],
+ ["w27","wan","ถุงเงิน ชากาแฟ & น้ำผลไม้ปั่น",Z.x,[W3,W2],0,""],
+ ["w28","wan","อะโวคาโด โสภณ",Z.so,[W3,W4],1,"ซ.โสภณ 9 · น้ำปั่น สลัด ไอศกรีม"],
+ ["w29","wan","ร้านน้ำปั่นผลไม้ และผลไม้สดจากสวน",Z.x,[W3],0,""],
+ ["w30","wan","ผลไม้ปอก พร้อมทาน",Z.tl,[W3],0,"ตลาดลานปูน"],
+ ["w31","wan","ครัวสะระแหน่ (มะพร้าวปั่นนมสด)",Z.x,[W3,W4],0,""],
+ ["w32","wan","จง ชง ดี",Z.my,[W3,W2],1,"ปั๊ม ปตท. มาบยา"],
+ ["w33","wan","Ai-CHA (ศาลเจ้าแม่จันเท)",Z.x,[W2,W4],0,"ใกล้ศาลเจ้าแม่จันเท"],
+ ["w34","wan","Ai-CHA โลตัสมาบตาพุด",Z.mall,[W2],0,""],
+ ["w35","wan","Mixue",Z.x,[W4,W2],0,""],
+ ["w36","wan","MARI MARI",Z.x,[W2],1,"ชานมไข่มุกเม็ดเล็กสีทอง"],
+ ["w37","wan","Kita Tea Stand",Z.x,[W2],0,"สาขามาบตาพุด"],
+ ["w38","wan","บับเบิ้ลฮันนี่",Z.x,[W2],0,"สาขามาบตาพุด"],
+ ["w39","wan","Hop Chafe ฟรีไข่มุก",Z.tl,[W2],1,"ตลาดลาว ติดบิ๊กซีมินิ"],
+ ["w40","wan","วิฬาร์ ชานม",Z.tl,[W2],0,"ตลาดลาว"],
+ ["w41","wan","Lucky Milk Cafe",Z.x,[W2],0,""],
+ ["w42","wan","ข้างสวน คาเฟ่",Z.x,[W2],0,""],
+ ["w43","wan","Welcome Tea",Z.x,[W2],1,""],
+ ["w44","wan","Little Duck Cha Shake",Z.x,[W2],1,""],
+ ["w45","wan","แฟ แฟร์ อ่ะค้าบ",Z.x,[W2],0,""],
+ ["w46","wan","USAGI ยูซากิ ขนมโตเกียว",Z.mall,[W2,W6],1,"เดอะวัน มาบตาพุด"],
+ ["w47","wan","ไอศครีมไผ่ทอง",Z.x,[W4],2,""],
+ ["w48","wan","ไอติม มาบตาพุด",Z.x,[W4],1,""],
+ ["w49","wan","โกดังไอติม",Z.x,[W4],0,""],
+ ["w50","wan","Dairy Queen โลตัส",Z.mall,[W4],0,""],
+ ["w51","wan","Swensen's โลตัส",Z.mall,[W4],0,""],
+ ["w52","wan","เครปไส้แตก โลตัส",Z.mall,[W6],0,""],
+ ["w53","wan","โตเกียวไส้แน่น ฟุกุโตเกียว",Z.nf,[W6,W5],2,"ถ.เนินพยอม"],
+ ["w54","wan","ขนมบ้าบิ่น ขนมครก แม่ยาย",Z.x,[W6],0,""],
+ ["w55","wan","กลืนกล้วย กรอบฟันแตก",Z.x,[W6],0,""],
+ ["w56","wan","ไอยู โตเกียว",Z.ta,[W6],1,"ตลาดสดเทศบาลมาบตาพุด"],
+ ["w57","wan","วันหวานนมแอนด์ปังปิ้ง",Z.x,[W6,W2],0,""],
+ ["w58","wan","มาลีบัวลอย มะพร้าวอ่อน",Z.ta,[W6,W7],1,"ตลาดสดเทศบาลมาบตาพุด"],
+ ["w59","wan","บ้านขนมไทย",Z.x,[W6],1,""],
+ ["w60","wan","ห่าวชือ ขนมหวานของคนร่ำรวย",Z.x,[W6],1,""],
+ ["w61","wan","อยากปังชีส",Z.x,[W6],0,""],
+ ["w62","wan","บิงซูพ่อแมวเหมียว",Z.x,[W7],0,""],
+ ["w63","wan","โก๊โน้ต เปาทับหลี & วาฟเฟิลนมสด",Z.so,[W6],1,"ตลาดเช้าวัดโสภณ ถ.สุขุมวิท 38"],
+ ["w64","wan","วาฟเฟิลนมสด @ร่วมพัฒนา",Z.rp,[W6],0,""],
+ ["w65","wan","Sri Bake Homemade Bakery",Z.x,[W5],0,""],
+ ["w66","wan","Sisterly",Z.x,[W5],0,""],
+ ["w67","wan","The moment bakery",Z.x,[W5],0,""]
+].map(a=>({id:a[0],mode:a[1],name:a[2],district:MTP,zone:a[3],types:a[4],price:a[5],note:a[6],closed:null}));
 
 /* ---------- state ---------- */
 const KEY="rayong-lunch-v1";
@@ -464,6 +554,7 @@ if(Array.isArray(S.zones)){ // migrate v1
 }
 delete S.zones;delete S.types;delete S.prices;
 S.custom.forEach(s=>{if(!s.mode) s.mode="kao";});
+if(S.dataVer!==2){S.f={};S.dataVer=2;} // new Map Ta Phut dataset: reset area filters
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 let mode=(location.hash==="#wan"||location.hash==="#kao")?location.hash.slice(1):(S.mode==="wan"?"wan":"kao");
@@ -472,11 +563,14 @@ $("today").textContent="วันนี้วัน"+DAYS[todayIdx];
 
 function shops(m){return PRESETS.concat(S.custom).filter(s=>s.mode===(m||mode));}
 function zoneKey(d,z){return d+"|"+z;}
+function dName(d){return d===MTP?"ต."+d:"อ."+d;}
+function place(s){return (s.zone===s.district||s.zone===Z.x)?dName(s.district):s.zone+" · "+dName(s.district);}
 function zonesOf(m){
   const map=new Map();
   shops(m).forEach(s=>{if(!map.has(s.district)) map.set(s.district,new Set());map.get(s.district).add(s.zone);});
   const ord=d=>{const i=DISTRICTS.indexOf(d);return i<0?99:i;};
-  return [...map.entries()].sort((a,b)=>ord(a[0])-ord(b[0])).map(([d,z])=>({d,z:[...z]}));
+  const zo=z=>{const i=ZONE_ORDER.indexOf(z);return i<0?50:i;};
+  return [...map.entries()].sort((a,b)=>ord(a[0])-ord(b[0])).map(([d,z])=>({d,z:[...z].sort((p,q)=>zo(p)-zo(q))}));
 }
 function zoneKeysOf(m){return zonesOf(m).flatMap(g=>g.z.map(z=>zoneKey(g.d,z)));}
 function F(m){
@@ -519,7 +613,7 @@ function renderZones(){
   shops().forEach(s=>{if(!S.excluded.includes(s.id)){const k=zoneKey(s.district,s.zone);counts[k]=(counts[k]||0)+1;}});
   zonesOf().forEach(g=>{
     const div=document.createElement("div");div.className="district";
-    const lab=document.createElement("button");lab.type="button";lab.className="dlabel";lab.textContent="อ."+g.d;
+    const lab=document.createElement("button");lab.type="button";lab.className="dlabel";lab.textContent=dName(g.d);
     lab.addEventListener("click",()=>{
       const keys=g.z.map(z=>zoneKey(g.d,z)),allOn=keys.every(k=>sel.has(k));
       f.zones=allOn?f.zones.filter(k=>!keys.includes(k)):[...new Set(f.zones.concat(keys))];update();
@@ -611,7 +705,7 @@ function slice(i,n,R,seg,o){
   if(n>1&&!o.win){ctx.strokeStyle="rgba(255,255,255,.6)";ctx.lineWidth=1.5;ctx.stroke();}
   if(o.win){ctx.save();ctx.shadowColor="rgba(255,214,120,.95)";ctx.shadowBlur=10+16*o.pulse;ctx.strokeStyle="#fff8e6";ctx.lineWidth=3+2*o.pulse;ctx.stroke();ctx.restore();}
   ctx.save();ctx.rotate(a0+seg/2);
-  const fs=Math.max(10,Math.min(17,R*0.7*seg*0.55))*(o.win?1.08:1);
+  const fs=Math.max(8,Math.min(17,R*0.7*seg*0.55))*(o.win?1.08:1);
   ctx.font=(o.win?"600 ":"500 ")+fs+"px Anuphan, 'Noto Sans Thai', sans-serif";
   ctx.globalAlpha=o.dim?1-0.45*o.dim:1;
   ctx.fillStyle=MODES[mode].dark[col]?"#2a0f1c":"#ffffff";
@@ -678,11 +772,11 @@ function spin(){
   }
   requestAnimationFrame(step);
 }
-function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.name+" "+(s.zone===s.district?"":s.zone+" ")+s.district+" ระยอง");}
+function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.name+" "+((s.zone===s.district||s.zone===Z.x)?"":s.zone+" ")+s.district+" ระยอง");}
 function metaTags(box,s){
   box.innerHTML="";
   const add=t=>{const e=document.createElement("span");e.className="tag";e.textContent=t;box.appendChild(e);};
-  add(s.zone===s.district?"อ."+s.district:s.zone+" · อ."+s.district);
+  add(place(s));
   s.types.forEach(add);add(PRICE_TXT[s.price||0]);
   if(s.closed!==null&&s.closed!==undefined) add("หยุดวัน"+DAYS[s.closed]);
 }
@@ -754,7 +848,7 @@ function renderList(){
   groups.forEach(g=>{
     const list=shops().filter(s=>s.district===g.d&&s.zone===g.z);
     const blk=document.createElement("div");blk.className="zone-block";
-    const h=document.createElement("p");h.className="zone-title";h.textContent=(g.z===g.d?"อ."+g.d:g.z+" · อ."+g.d)+" ("+list.length+")";blk.appendChild(h);
+    const h=document.createElement("p");h.className="zone-title";h.textContent=(g.z===g.d?dName(g.d):g.z+" · "+dName(g.d))+" ("+list.length+")";blk.appendChild(h);
     list.forEach(s=>{
       const row=document.createElement("div");row.className="shop"+(ex.has(s.id)?" off":"");
       const cb=document.createElement("input");cb.type="checkbox";cb.id="cb-"+s.id;cb.checked=!ex.has(s.id);
@@ -786,7 +880,6 @@ function renderList(){
 }
 
 /* ---------- add form ---------- */
-DISTRICTS.forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=d;$("fDistrict").appendChild(o);});
 DAYS.forEach((d,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent="วัน"+d;$("fClosed").appendChild(o);});
 let fMode=mode,fTypes=[];
 function renderForm(){
@@ -797,17 +890,16 @@ function renderForm(){
   renderZoneList();
 }
 function renderZoneList(){
-  const d=$("fDistrict").value,dl=$("zoneList");dl.innerHTML="";
+  const d=MTP,dl=$("zoneList");dl.innerHTML="";
   const set=new Set();["kao","wan"].forEach(m=>{const g=zonesOf(m).find(x=>x.d===d);if(g) g.z.forEach(z=>set.add(z));});
   if(!set.size) set.add(d);
   set.forEach(z=>{const o=document.createElement("option");o.value=z;dl.appendChild(o);});
 }
-$("fDistrict").addEventListener("change",renderZoneList);
 $("addForm").addEventListener("submit",e=>{
   e.preventDefault();
   const name=$("fName").value.trim(),msg=$("addMsg");
   if(!name){msg.textContent="ใส่ชื่อร้านก่อนนะ";msg.classList.add("err");$("fName").focus();return;}
-  const district=$("fDistrict").value,zone=$("fZone").value.trim()||district;
+  const district=MTP,zone=$("fZone").value.trim()||Z.x;
   const shop={id:"u"+Date.now().toString(36),mode:fMode,name,district,zone,types:fTypes.length?fTypes.slice():[MODES[fMode].types[fMode==="kao"?1:0]],
     price:+$("fPrice").value,note:$("fNote").value.trim(),closed:$("fClosed").value===""?null:+$("fClosed").value};
   S.custom.push(shop);
@@ -835,8 +927,8 @@ $("importBtn").addEventListener("click",()=>{
     arr.forEach((r,i)=>{
       if(!r||typeof r.name!=="string"||!r.name.trim()) return;
       const md=r.mode==="wan"?"wan":"kao";
-      const district=typeof r.district==="string"&&r.district?r.district:"เมืองระยอง";
-      const zone=typeof r.zone==="string"&&r.zone?r.zone:district;
+      const district=typeof r.district==="string"&&r.district?r.district:MTP;
+      const zone=typeof r.zone==="string"&&r.zone?r.zone:Z.x;
       if(S.custom.some(s=>s.name===r.name&&s.zone===zone&&s.mode===md)) return;
       const types=Array.isArray(r.types)?r.types.filter(t=>MODES[md].types.includes(t)):[];
       S.custom.push({id:"u"+Date.now().toString(36)+i,mode:md,name:r.name.trim(),district,zone,
@@ -874,7 +966,7 @@ $("histClear").addEventListener("click",()=>{S.history=[];update();});
 function applyMode(animate){
   const M=MODES[mode];
   document.documentElement.setAttribute("data-mode",mode);
-  document.title=(mode==="wan"?"ของหวานร้านไหนดี":"เที่ยงนี้กินไหน")+" ระยอง";
+  document.title=(mode==="wan"?"ของหวาน น้ำปั่น":"เที่ยงนี้กินไหน")+" มาบตาพุด";
   $("title").innerHTML=M.title;$("sub").textContent=M.sub;$("typeHead").textContent=M.typeHead;
   $("logo").innerHTML=LOGO[mode];
   ["kao","wan"].forEach(m=>{const b=$("m-"+m);if(m===mode)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
