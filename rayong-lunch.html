@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="th" data-mode="kao">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>เที่ยงนี้กินไหน ระยอง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@500;600&family=Anuphan:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: phone = one column, mode switch docked at the bottom like an app tab bar.
+   Wide screen = wheel pinned on the left, filters + shop list scroll on the right, mode switch in the header.
+   Two modes share neutrals; ของคาว = deep sea + chili, ของหวาน = berry + pink. */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --ink:#11202a; --muted:#55656e; --line:#d6dfe2; --chip:#e6edef;
+  --primary:#0d3a4a; --accent:#de4f28; --accent-ink:#ffffff; --ring:#0b3440; --glow:rgba(222,79,40,.16);
+  --warn:#b42318;
+  --font-display:"Mitr","Anuphan",system-ui,sans-serif;
+  --font-body:"Anuphan","Noto Sans Thai","Leelawadee UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+:root[data-mode="wan"]{
+  --bg:#fbeff4; --line:#eed6e0; --chip:#f6e3eb;
+  --primary:#86204f; --accent:#d43f78; --ring:#5c1638; --glow:rgba(212,63,120,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1417; --surface:#142026; --ink:#e6eef0; --muted:#97a8ae; --line:#25363e; --chip:#1d2e35;
+    --primary:#8fd0dc; --accent:#f27a48; --accent-ink:#1b0c05; --ring:#06232c; --glow:rgba(242,122,72,.10);
+    --warn:#ff8a7a; color-scheme:dark;
+  }
+  :root:not([data-theme="light"])[data-mode="wan"]{
+    --bg:#170e13; --surface:#22161d; --line:#3a2531; --chip:#2e1e27;
+    --primary:#f4a9c7; --accent:#f07aa6; --accent-ink:#22070f; --ring:#3d0d24; --glow:rgba(240,122,166,.10);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1417; --surface:#142026; --ink:#e6eef0; --muted:#97a8ae; --line:#25363e; --chip:#1d2e35;
+  --primary:#8fd0dc; --accent:#f27a48; --accent-ink:#1b0c05; --ring:#06232c; --glow:rgba(242,122,72,.10);
+  --warn:#ff8a7a; color-scheme:dark;
+}
+:root[data-theme="dark"][data-mode="wan"]{
+  --bg:#170e13; --surface:#22161d; --line:#3a2531; --chip:#2e1e27;
+  --primary:#f4a9c7; --accent:#f07aa6; --accent-ink:#22070f; --ring:#3d0d24; --glow:rgba(240,122,166,.10);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);background-image:radial-gradient(900px 420px at 15% -10%,var(--glow),transparent 70%);background-attachment:fixed;color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;transition:background-color .4s}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.app{max-width:1180px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(104px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:grid;gap:16px}
+@media (min-width:760px){.app{padding-bottom:40px;padding-top:24px}}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--primary);display:grid;place-items:center;flex:none;transition:background-color .4s}
+.logo svg{width:26px;height:26px;color:var(--surface)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(22px,3.4vw,30px);line-height:1.15;margin:0;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{margin:2px 0 0;color:var(--muted);font-size:14px}
+.top-right{display:flex;align-items:center;gap:10px}
+.today{font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+
+/* mode switch */
+.modebar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.mode{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:600;color:var(--muted);transition:background-color .25s,color .25s}
+.mode svg{width:20px;height:20px;flex:none}
+.mode .cnt{font-size:12px;font-weight:500;background:var(--chip);color:var(--muted);border-radius:999px;padding:0 7px;font-variant-numeric:tabular-nums}
+.mode[aria-current="page"]{background:var(--primary);color:var(--surface)}
+.mode[aria-current="page"] .cnt{background:color-mix(in srgb,var(--surface) 25%,transparent);color:var(--surface)}
+.mode:disabled{cursor:not-allowed}
+@media (max-width:759px){
+  .modebar{position:fixed;left:0;right:0;bottom:0;z-index:40;border-radius:18px 18px 0 0;border:0;border-top:1px solid var(--line);
+    padding:8px max(12px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));box-shadow:0 -8px 24px rgba(0,0,0,.10)}
+  .mode{flex:1;justify-content:center;flex-direction:column;gap:2px;padding:8px 6px;border-radius:14px;font-size:14px}
+  .mode svg{width:24px;height:24px}
+  .top-right .today{display:none}
+}
+
+/* layout */
+.layout{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:880px){
+  .layout{grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);align-items:start}
+  .wheel-panel{position:sticky;top:16px}
+}
+.side{display:grid;gap:16px;min-width:0;grid-template-columns:minmax(0,1fr)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;transition:background-color .4s,border-color .4s}
+@media (max-width:480px){.panel{padding:14px;border-radius:16px}}
+h2{font-family:var(--font-display);font-weight:500;font-size:18px;margin:0 0 10px}
+h3{font-size:14px;font-weight:600;margin:0;color:var(--muted)}
+
+/* wheel */
+.wheel-box{display:grid;gap:14px;justify-items:center}
+.wheel-wrap{position:relative;width:min(100%,460px);aspect-ratio:1}
+#wheel{width:100%;height:100%;display:block}
+#wheel.swap{animation:swap .55s cubic-bezier(.2,1.2,.4,1)}
+@keyframes swap{0%{transform:scale(.82) rotate(-35deg);opacity:.15}100%{transform:none;opacity:1}}
+.pointer{position:absolute;left:50%;top:-4px;transform:translateX(-50%);transform-origin:50% 0;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));z-index:2}
+.pointer.tick{animation:ptick .16s ease-out}
+.pointer.land{animation:pland .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes ptick{0%{transform:translateX(-50%) rotate(0)}35%{transform:translateX(-50%) rotate(-24deg)}100%{transform:translateX(-50%) rotate(0)}}
+@keyframes pland{0%{transform:translateX(-50%) translateY(0) scale(1)}30%{transform:translateX(-50%) translateY(-8px) scale(1.25)}100%{transform:translateX(-50%) translateY(0) scale(1)}}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:23%;aspect-ratio:1;border-radius:50%;border:4px solid var(--surface);background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:clamp(15px,4vw,21px);cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);transition:scale .15s ease,background-color .3s;animation:breathe 2.4s ease-in-out infinite}
+.hub:hover:not(:disabled){scale:1.05}
+.hub:active:not(:disabled){scale:.92}
+.hub:disabled{animation:none;opacity:.85;cursor:not-allowed}
+@keyframes breathe{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,.25),0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}60%{box-shadow:0 4px 14px rgba(0,0,0,.25),0 0 0 16px color-mix(in srgb,var(--accent) 0%,transparent)}}
+.empty-msg[hidden]{display:none}
+.empty-msg{position:absolute;inset:20%;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:14px;pointer-events:none}
+.pool-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center}
+.pool-line{font-size:14px;color:var(--muted);text-align:center}
+.pool-line b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+.result{width:100%;border:2px solid var(--accent);border-radius:14px;padding:14px 16px;display:grid;gap:6px;background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.result[hidden]{display:none}
+.result.show{animation:pop .55s cubic-bezier(.2,1.5,.4,1)}
+.result .eyebrow{font-size:13px;color:var(--accent);font-weight:600}
+.result .name{font-family:var(--font-display);font-size:clamp(19px,4.6vw,23px);font-weight:600;line-height:1.25;justify-self:start}
+.result.show .name{background:linear-gradient(transparent 62%,color-mix(in srgb,var(--accent) 28%,transparent) 62%) no-repeat 0 0/0% 100%;animation:mark .7s .25s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.94)}100%{opacity:1;transform:none}}
+@keyframes mark{to{background-size:100% 100%}}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted)}
+.tag{background:var(--chip);border-radius:6px;padding:1px 8px;color:var(--ink)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+@media (max-width:480px){.result .actions .btn{flex:1 1 auto;justify-content:center}}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:14px;transition:transform .12s ease,border-color .15s,background-color .2s}
+.btn:hover{border-color:var(--primary)}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.primary.done{background:var(--primary);border-color:var(--primary);color:var(--surface);animation:pop .4s ease-out}
+.btn.ghost{background:transparent}
+.btn.sm{padding:4px 10px;font-size:13px}
+
+/* filters */
+.ftoggle{display:none}
+@media (max-width:879px){
+  .ftoggle{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+  .ftoggle>span{min-width:0;flex:1}
+  .ftoggle .ft-sum{font-size:13px;color:var(--muted);display:block}
+  .ftoggle .chev{transition:transform .2s;flex:none}
+  .filters.open .ftoggle .chev{transform:rotate(180deg)}
+  .filters:not(.open) .filters-body{display:none}
+  .filters.open .filters-body{margin-top:12px}
+  .filters .fh{display:none}
+}
+.fgroup{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.fgroup:first-of-type{border-top:0;padding-top:0}
+.fhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;line-height:1.4;transition:background-color .18s,color .18s,border-color .18s,transform .12s}
+.chip:active{transform:scale(.94)}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--surface)}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums;margin-left:4px;font-size:12px}
+.district + .district{margin-top:8px}
+.district{display:grid;gap:6px}
+.dlabel{background:none;border:0;padding:0;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;text-align:left;justify-self:start}
+.dlabel:hover{color:var(--ink);text-decoration:underline}
+.linkbtn{background:none;border:0;padding:0;color:var(--primary);cursor:pointer;font-size:13px;text-decoration:underline}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:14px}
+.row label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+input[type=checkbox]{accent-color:var(--accent)}
+select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 8px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 14px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:8px 12px;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabpanel[hidden]{display:none}
+.zone-block + .zone-block{margin-top:14px}
+.zone-title{font-size:14px;font-weight:600;color:var(--primary);margin:0 0 4px}
+.shop{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:start;padding:9px 0;border-top:1px dashed var(--line);transition:opacity .2s}
+.shop input{margin-top:5px;width:17px;height:17px}
+.shop .sname{font-weight:600;cursor:pointer}
+.shop.off{opacity:.6}
+.shop.off .sname{text-decoration:line-through}
+.shop .note{font-size:13px;color:var(--muted)}
+.shop .side-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:520px){.shop{grid-template-columns:auto 1fr}.shop .side-act{grid-column:2;justify-content:flex-start}}
+.mine{font-size:11px;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px}
+
+form{display:grid;gap:12px}
+.field{display:grid;gap:4px;min-width:0}
+.field label,.field legend{font-size:14px;font-weight:600}
+.field input[type=text],.field select,.field textarea{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 10px;width:100%}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+.two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.ok{color:var(--primary);font-size:14px;min-height:1.4em;margin:0}
+.err{color:var(--warn)}
+details{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.hist{list-style:none;margin:0;padding:0;display:grid}
+.hist li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px dashed var(--line);font-size:14px}
+.hist .mtag{font-size:11px;border-radius:4px;padding:0 6px;margin-right:6px;background:var(--chip);color:var(--muted)}
+.hist time{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.foot{font-size:13px;color:var(--muted);max-width:80ch;margin:0}
+.foot a{color:var(--primary)}
+.fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}.result.show .name{background-size:100% 100%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true" id="logo"></div>
+      <div>
+        <h1 id="title">เที่ยงนี้กินไหน <span>ระยอง</span></h1>
+        <p class="sub" id="sub"></p>
+      </div>
+    </div>
+    <div class="top-right">
+      <nav class="modebar" aria-label="เลือกหมวด">
+        <button class="mode" type="button" data-m="kao" id="m-kao">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12h18a9 9 0 0 1-18 0Z"/><path d="M8 20h8"/><path d="M9 8c0-1.2 1-1.6 1-2.8M13 8c0-1.2 1-1.6 1-2.8"/></svg>
+          <span>ของคาว</span><span class="cnt" id="c-kao"></span>
+        </button>
+        <button class="mode" type="button" data-m="wan" id="m-wan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 11h9L12 21.5Z"/><path d="M7 11a5 5 0 0 1 10 0"/><circle cx="12" cy="4.3" r="1.2" fill="currentColor"/></svg>
+          <span>ของหวาน</span><span class="cnt" id="c-wan"></span>
+        </button>
+      </nav>
+      <div class="today" id="today"></div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel wheel-panel" aria-labelledby="wheel-h">
+      <h2 id="wheel-h" class="sr">วงล้อสุ่มร้าน</h2>
+      <div class="wheel-box">
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" aria-label="วงล้อสุ่มร้าน"></canvas>
+          <div class="empty-msg" id="emptyMsg" hidden>ไม่มีร้านตรงเงื่อนไข<br>ลองเลือกย่านหรือประเภทเพิ่ม</div>
+          <button class="hub" id="spinBtn" type="button">หมุน!</button>
+        </div>
+        <div class="pool-row">
+          <div class="pool-line" id="poolLine"></div>
+          <button class="btn sm ghost" type="button" id="soundBtn" aria-pressed="true"></button>
+        </div>
+        <div class="result" id="result" hidden aria-live="polite">
+          <div class="eyebrow" id="rEyebrow"></div>
+          <div class="name" id="rName"></div>
+          <div class="meta" id="rMeta"></div>
+          <div class="note" id="rNote" style="font-size:14px"></div>
+          <div class="actions">
+            <button class="btn primary" type="button" id="goBtn">ตกลง ไปร้านนี้</button>
+            <button class="btn" type="button" id="againBtn">หมุนใหม่</button>
+            <a class="btn ghost" id="mapLink" href="#" target="_blank" rel="noopener">Google Maps ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="panel filters open" id="filters" aria-labelledby="filter-h">
+        <button class="ftoggle" type="button" id="ftoggle" aria-expanded="true" aria-controls="filtersBody">
+          <span><h2 style="margin:0">ตัวกรองวงล้อ</h2><span class="ft-sum" id="ftSum"></span></span>
+          <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filters-body" id="filtersBody">
+          <h2 class="fh" id="filter-h">วงล้อสุ่มจากร้านไหนบ้าง</h2>
+          <div class="fgroup">
+            <div class="fhead"><h3>ย่าน / อำเภอ</h3>
+              <span><button class="linkbtn" type="button" id="zAll">เลือกทั้งหมด</button> · <button class="linkbtn" type="button" id="zNone">ล้าง</button></span>
+            </div>
+            <p class="hint">กดชื่ออำเภอเพื่อเลือกหรือยกเลิกทั้งอำเภอ</p>
+            <div id="zoneChips"></div>
+          </div>
+          <div class="fgroup">
+            <div class="fhead"><h3 id="typeHead">อยากกินแนวไหน</h3><button class="linkbtn" type="button" id="tClear">ไม่จำกัด</button></div>
+            <div class="chips" id="typeChips"></div>
+          </div>
+          <div class="fgroup">
+            <div class="fhead"><h3>งบต่อคน</h3><button class="linkbtn" type="button" id="pClear">ไม่จำกัด</button></div>
+            <div class="chips" id="priceChips"></div>
+          </div>
+          <div class="fgroup">
+            <h3>กันเบื่อ</h3>
+            <div class="row">
+              <label><input type="checkbox" id="skipClosed"> ข้ามร้านที่หยุดวันนี้</label>
+              <label>ไม่ซ้ำร้านที่ไปใน
+                <select id="recentDays">
+                  <option value="0">ไม่กำหนด</option>
+                  <option value="1">1 วัน</option>
+                  <option value="3">3 วัน</option>
+                  <option value="5">5 วัน</option>
+                  <option value="7">7 วัน</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" id="tab-list" aria-controls="pane-list" aria-selected="true" type="button">รายชื่อร้าน</button>
+          <button class="tab" role="tab" id="tab-add" aria-controls="pane-add" aria-selected="false" type="button">เพิ่มร้านของฉัน</button>
+          <button class="tab" role="tab" id="tab-hist" aria-controls="pane-hist" aria-selected="false" type="button">ประวัติ</button>
+        </div>
+
+        <div class="tabpanel" id="pane-list" role="tabpanel" aria-labelledby="tab-list">
+          <p class="hint" style="margin-bottom:10px">เอาเครื่องหมายถูกออกเพื่อตัดร้านนั้นออกจากวงล้อ แสดงเฉพาะร้านในย่านที่เลือกไว้</p>
+          <div id="shopList"></div>
+        </div>
+
+        <div class="tabpanel" id="pane-add" role="tabpanel" aria-labelledby="tab-add" hidden>
+          <form id="addForm" novalidate>
+            <fieldset class="field">
+              <legend>หมวด</legend>
+              <div class="chips" id="fMode"></div>
+            </fieldset>
+            <div class="field">
+              <label for="fName">ชื่อร้าน</label>
+              <input type="text" id="fName" placeholder="เช่น ข้าวแกงป้าหน้าโรงงาน" required>
+            </div>
+            <div class="two">
+              <div class="field">
+                <label for="fDistrict">อำเภอ</label>
+                <select id="fDistrict"></select>
+              </div>
+              <div class="field">
+                <label for="fZone">ย่าน (ใช้เป็นตัวกรองของวงล้อ)</label>
+                <input type="text" id="fZone" list="zoneList" placeholder="เช่น มาบตาพุด, หน้านิคมฯ">
+                <datalist id="zoneList"></datalist>
+              </div>
+            </div>
+            <fieldset class="field">
+              <legend>ประเภท (เลือกได้หลายอย่าง)</legend>
+              <div class="chips" id="fTypes"></div>
+            </fieldset>
+            <div class="two">
+              <div class="field">
+                <label for="fPrice">งบต่อคน</label>
+                <select id="fPrice">
+                  <option value="1">ต่ำกว่า 100 บาท</option>
+                  <option value="2">100–250 บาท</option>
+                  <option value="3">250 บาทขึ้นไป</option>
+                  <option value="0">ไม่ระบุ</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="fClosed">วันหยุดร้าน</label>
+                <select id="fClosed"><option value="">ไม่มี / ไม่ทราบ</option></select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="fNote">โน้ต</label>
+              <input type="text" id="fNote" placeholder="เช่น เมนูเด็ด, เวลาเปิด, ที่จอดรถ">
+            </div>
+            <div class="actions"><button class="btn primary" type="submit">เพิ่มร้านเข้าวงล้อ</button></div>
+            <p class="ok" id="addMsg" role="status"></p>
+          </form>
+
+          <details>
+            <summary>สำรอง / ย้ายรายชื่อร้านของฉันไปเครื่องอื่น</summary>
+            <p class="hint" style="margin:8px 0">ร้านที่เพิ่มเองเก็บไว้ในเบราว์เซอร์นี้เท่านั้น คัดลอกข้อความด้านล่างไปวางในเครื่องอื่น หรือส่งให้เพื่อนร่วมงานกด "นำเข้า"</p>
+            <div class="field">
+              <label for="exportBox">ข้อมูลร้านของฉัน (ทั้งของคาวและของหวาน)</label>
+              <textarea id="exportBox" readonly></textarea>
+            </div>
+            <div class="actions"><button class="btn sm" type="button" id="copyBtn">คัดลอก</button></div>
+            <div class="field" style="margin-top:10px">
+              <label for="importBox">วางข้อมูลเพื่อนำเข้า</label>
+              <textarea id="importBox" placeholder='[{"name":"...","mode":"kao","district":"...","zone":"..."}]'></textarea>
+            </div>
+            <div class="actions"><button class="btn sm" type="button" id="importBtn">นำเข้า</button></div>
+            <p class="ok" id="ioMsg" role="status"></p>
+          </details>
+        </div>
+
+        <div class="tabpanel" id="pane-hist" role="tabpanel" aria-labelledby="tab-hist" hidden>
+          <p class="hint" style="margin-bottom:8px">บันทึกเมื่อกด "ตกลง ไปร้านนี้" ใช้กับตัวเลือก "ไม่ซ้ำร้านที่ไป"</p>
+          <ul class="hist" id="histList"></ul>
+          <div class="actions"><button class="btn sm" type="button" id="histClear">ล้างประวัติ</button></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <p class="foot">รายชื่อร้านตั้งต้นรวบรวมจากรีวิวและบทความบน <a href="https://www.wongnai.com/listings/restaurant-rayong" target="_blank" rel="noopener">Wongnai</a> และ <a href="https://www.matichon.co.th/lifestyle/food-travel/news_5748914" target="_blank" rel="noopener">มติชน</a> (พ.ย. 2569) เวลาเปิด-ปิดและวันหยุดอาจเปลี่ยน ควรเช็กก่อนออกเดินทาง ร้านที่เพิ่มเอง การตัดร้าน และประวัติ จะจำไว้ในเบราว์เซอร์เครื่องนี้</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const DISTRICTS=["เมืองระยอง","บ้านฉาง","แกลง","บ้านค่าย","ปลวกแดง","นิคมพัฒนา","เขาชะเมา","วังจันทร์"];
+const DAYS=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const PRICES=[{v:1,t:"ต่ำกว่า 100"},{v:2,t:"100–250"},{v:3,t:"250+"}];
+const PRICE_TXT={0:"งบไม่ระบุ",1:"฿ ต่ำกว่า 100",2:"฿฿ 100–250",3:"฿฿฿ 250+"};
+
+const MODES={
+  kao:{label:"ของคาว",title:'เที่ยงนี้กินไหน <span>ระยอง</span>',sub:"เลือกย่าน เลือกของที่อยากกิน แล้วให้วงล้อตัดสินใจแทน",
+    eyebrow:"เที่ยงนี้ไปร้านนี้",typeHead:"อยากกินแนวไหน",
+    types:["ก๋วยเตี๋ยว","ตามสั่ง/จานเดียว","ข้าวมันไก่/ข้าวแกง","อาหารทะเล","อีสาน/ส้มตำ","อาหารไทย/พื้นบ้าน","ญี่ปุ่น"],
+    colors:["#0d3a4a","#de4f28","#eea532","#21877b","#b3261e","#58704a"],dark:{"#eea532":1},
+    ring:"#0b3440",bulb:"#ffd166"},
+  wan:{label:"ของหวาน",title:'ของหวานร้านไหนดี <span>ระยอง</span>',sub:"กินข้าวเสร็จแล้วต่อของหวานร้านไหน ให้วงล้อเลือกให้",
+    eyebrow:"ของหวานวันนี้",typeHead:"อยากกินหวานแบบไหน",
+    types:["ขนมไทย","บิงซู/น้ำแข็งไส","เค้ก/เบเกอรี","คาเฟ่","ไอศกรีม","เครื่องดื่ม/ชานม"],
+    colors:["#d43f78","#f7c3d5","#86204f","#86d3bd","#f4be66","#b994de"],dark:{"#f7c3d5":1,"#86d3bd":1,"#f4be66":1,"#b994de":1},
+    ring:"#5c1638",bulb:"#fff1a8"}
+};
+const LOGO={kao:document.querySelector("#m-kao svg").outerHTML,wan:document.querySelector("#m-wan svg").outerHTML};
+
+const R1="เมืองระยอง";
+const PRESETS=[
+ ["p1","kao","ก๋วยเตี๋ยวเส้นปลา เกี๊ยวปลา เจ๊จิ๋ม",R1,"ตัวเมือง",["ก๋วยเตี๋ยว"],1,"ถ.ตากสิน · เกี๊ยวปลา เส้นปลา · เปิดถึงราว 16:00"],
+ ["p2","kao","ขาหมู หมูกรอบ วัดลุ่ม",R1,"ตัวเมือง",["ข้าวมันไก่/ข้าวแกง"],1,"ย่านวัดลุ่ม"],
+ ["p3","kao","นุ้ยข้าวขาหมูโอวัลติน",R1,"ตัวเมือง",["ข้าวมันไก่/ข้าวแกง"],1,"ย่านกรอกยายชา · ราว 06:00–18:00"],
+ ["p4","kao","Fin Sushi Rayong แยกบ้านดอน",R1,"ตัวเมือง",["ญี่ปุ่น"],3,"แยกบ้านดอน"],
+ ["p6","kao","กระเพราในแคมป์ (เจ้อ้วน)",R1,"ตัวเมือง",["ตามสั่ง/จานเดียว"],1,"ซ.ลุงคล้อย ท่าประดู่ · รับทำข้าวกล่อง"],
+ ["p7","kao","กระเพราลุงหนวด",R1,"เชิงเนิน / เนินพระ",["ตามสั่ง/จานเดียว"],1,"ย่านศักดิ์สายธาร เชิงเนิน"],
+ ["p8","kao","ก๋วยจั๊บญวนอุบลเส้นสด ไข่กระทะ",R1,"เชิงเนิน / เนินพระ",["ก๋วยเตี๋ยว"],1,"ต.เชิงเนิน · เปิดถึงราว 17:00"],
+ ["p9","kao","ครัวบ้านฉัน-ข้าวหน้าล้น",R1,"เชิงเนิน / เนินพระ",["ตามสั่ง/จานเดียว"],1,"ถ.สุขุมวิท เนินพระ · ฟรีไข่ดาว · มีเดลิเวอรี"],
+ ["p10","kao","แหลมเจริญซีฟู้ด",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล"],3,"ถ.เลียบชายฝั่ง แถวหาดแสงจันทร์ · ปลากะพงทอดน้ำปลา"],
+ ["p11","kao","เจ๊อึ่ง ซีฟู้ด หาดแม่รำพึง",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล"],3,"หาดแม่รำพึง"],
+ ["p12","kao","บ้านครัวประมง",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล","อาหารไทย/พื้นบ้าน"],3,"หาดแม่รำพึง"],
+ ["p13","kao","ครัวปากน้ำ",R1,"ริมหาด แม่รำพึง–ปากน้ำ",["อาหารทะเล","อาหารไทย/พื้นบ้าน"],2,"ข้าวผัดครัวปากน้ำ · ห่อหมกปลา"],
+ ["p14","kao","ข้าวมันไก่ วงเวียนปลาโลมา",R1,"มาบตาพุด",["ข้าวมันไก่/ข้าวแกง"],1,"แยกหนองแฟบ · รถเข็น ขายข้าวมันไก่อย่างเดียว"],
+ ["p15","kao","ก๋วยเตี๋ยวเป็ดตุ๋น ร้านธรรมดา",R1,"มาบตาพุด",["ก๋วยเตี๋ยว"],1,"หัวมุม ถ.โสภณ 2 · เปิดราว 11:30"],
+ ["p16","kao","ห่อหมกป้าจิ๋วบ้านเพ",R1,"บ้านเพ",["อาหารไทย/พื้นบ้าน"],2,"บ้านเพ"],
+ ["p17","kao","เจ๊ต่าย ปูเป็น สาขาบ้านเพ",R1,"บ้านเพ",["อาหารทะเล"],2,"บ้านเพ"],
+ ["p18","kao","ส้มตำ ซุ้มบ้านสวน",R1,"บ้านเพ",["อีสาน/ส้มตำ"],1,"ต.เพ · เปิดถึงราว 22:00"],
+ ["p19","kao","ป้าตุ่มก๋วยเตี๋ยวแกงส้ม","บ้านฉาง","บ้านฉาง",["ก๋วยเตี๋ยว","ข้าวมันไก่/ข้าวแกง"],1,"ตัวเมืองบ้านฉาง · เปิดเช้าถึงบ่ายสามกว่า"],
+ ["p20","kao","มธุรสโภชนา","บ้านฉาง","บ้านฉาง",["ตามสั่ง/จานเดียว"],2,"บ้านฉาง"],
+ ["p22","kao","เกี๊ยวปลานายเคี้ยม","แกลง","แกลง",["ก๋วยเตี๋ยว"],1,"ร้านเก่ากว่า 60 ปี · เกี๊ยวปลา เกี๊ยวกุ้ง"],
+ ["p23","kao","ครัวครูบุษบา ผัดไทยกุ้งสด","แกลง","แกลง",["ตามสั่ง/จานเดียว"],1,"ต.วังหว้า ริม ถ.สุขุมวิท · เปิดถึงราว 16:00",4],
+ ["p24","kao","มาเด้อข้าวแกง","แกลง","แกลง",["ข้าวมันไก่/ข้าวแกง"],1,"แกลง"],
+ ["p25","kao","ครัว 3 ย่าน แกลง","แกลง","แกลง",["อาหารไทย/พื้นบ้าน"],2,"แกลง"],
+ ["p26","kao","มหาสมุทรซีฟู้ด","แกลง","แกลง",["อาหารทะเล"],0,"กุ้งแช่น้ำปลา"],
+ ["p27","kao","ร้านอาหารกุ๊กกิ๊กทัวร์","แกลง","ริมเพ / แหลมแม่พิมพ์",["ตามสั่ง/จานเดียว","อาหารทะเล"],1,"ตรงข้ามโนโวเทล ริมเพ · ข้าวต้มทะเล"],
+ ["p28","kao","ครัวทะเลซีฟู้ด หาดแหลมแม่พิมพ์","แกลง","ริมเพ / แหลมแม่พิมพ์",["อาหารทะเล"],3,"หาดแหลมแม่พิมพ์"],
+ ["p29","kao","ปลาดุกป้าฑา","บ้านค่าย","บ้านค่าย",["อาหารไทย/พื้นบ้าน"],0,"ซ.วัดบ้านค่าย · เปิดมาราว 60 ปี · เมนูปลาดุก"],
+ ["p30","kao","รัชนีตามสั่ง","บ้านค่าย","บ้านค่าย",["ตามสั่ง/จานเดียว"],1,"ข้างสำนักงานที่ดินบ้านค่าย · ถึงราว 15:30"],
+ ["p31","kao","ร้านตำเอ็นใหญ่ (Tum Engineer)","ปลวกแดง","ปลวกแดง",["อีสาน/ส้มตำ"],1,"ราว 08:30–20:30"],
+ /* ของหวาน */
+ ["d1","wan","ร้านขนมหวานสะพานไม้",R1,"ตัวเมือง",["ขนมไทย"],1,"ถ.ราษฎร์บำรุง · ขนมหวานแบบไทย · เปิดถึงราว 15:00"],
+ ["d2","wan","ญาจินดม คาเฟ่ขนมไทย",R1,"ตัวเมือง",["ขนมไทย","คาเฟ่"],1,"ต้นซอยยมจินดา · อินทนิล ขนมโค · ติดแอร์"],
+ ["d3","wan","At Ease Sweet & Eatery",R1,"ตัวเมือง",["คาเฟ่","เค้ก/เบเกอรี"],2,"ถ.ราชชุมพล · เปิดราว 10:30"],
+ ["p5","wan","Cafe Kantary Rayong",R1,"ตัวเมือง",["คาเฟ่","เค้ก/เบเกอรี"],2,"ริม ถ.สุขุมวิท"],
+ ["d4","wan","ร้านเค้ก-อ้อมกอดเค้ก",R1,"เชิงเนิน / เนินพระ",["เค้ก/เบเกอรี"],0,"ถ.กรอกยายชา เนินพระ · เปิดถึงราว 22:00"],
+ ["p21","wan","กาแฟท่าพระจันทร์ คอฟฟี่ แอนด์ คิทเช่น","บ้านฉาง","บ้านฉาง",["คาเฟ่","เค้ก/เบเกอรี"],2,"หมู่บ้านเดอะลิฟวิ่ง · เปิดถึงราว 17:00"],
+ ["d5","wan","ศิลา คอฟฟี่","แกลง","แกลง",["คาเฟ่","เค้ก/เบเกอรี"],1,"ริม ถ.สุขุมวิท · เค้กหลายเมนู ลาวา"],
+ ["d6","wan","แกลงกร่ำกาแฟสด","แกลง","ริมเพ / แหลมแม่พิมพ์",["คาเฟ่","เค้ก/เบเกอรี"],0,"ทางไปโนโวเทล ริมเพ · กาแฟและเบเกอรี"],
+ ["d7","wan","หลักกิโลคอฟฟี่","ปลวกแดง","ปลวกแดง",["เครื่องดื่ม/ชานม"],0,"ชาไทยวิปชีส"]
+].map(a=>({id:a[0],mode:a[1],name:a[2],district:a[3],zone:a[4],types:a[5],price:a[6],note:a[7],closed:(a[8]===undefined?null:a[8])}));
+
+/* ---------- state ---------- */
+const KEY="rayong-lunch-v1";
+let S={custom:[],excluded:[],history:[],f:{},recentDays:3,skipClosed:true,sound:true,mode:"kao",fOpen:true};
+try{const raw=localStorage.getItem(KEY);if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+if(!S.f||typeof S.f!=="object") S.f={};
+if(Array.isArray(S.zones)){ // migrate v1
+  S.f.kao={zones:S.zones,types:(S.types||[]).filter(t=>MODES.kao.types.includes(t)),prices:S.prices||[]};
+}
+delete S.zones;delete S.types;delete S.prices;
+S.custom.forEach(s=>{if(!s.mode) s.mode="kao";});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+let mode=(location.hash==="#wan"||location.hash==="#kao")?location.hash.slice(1):(S.mode==="wan"?"wan":"kao");
+const todayIdx=new Date().getDay();
+$("today").textContent="วันนี้วัน"+DAYS[todayIdx];
+
+function shops(m){return PRESETS.concat(S.custom).filter(s=>s.mode===(m||mode));}
+function zoneKey(d,z){return d+"|"+z;}
+function zonesOf(m){
+  const map=new Map();
+  shops(m).forEach(s=>{if(!map.has(s.district)) map.set(s.district,new Set());map.get(s.district).add(s.zone);});
+  const ord=d=>{const i=DISTRICTS.indexOf(d);return i<0?99:i;};
+  return [...map.entries()].sort((a,b)=>ord(a[0])-ord(b[0])).map(([d,z])=>({d,z:[...z]}));
+}
+function zoneKeysOf(m){return zonesOf(m).flatMap(g=>g.z.map(z=>zoneKey(g.d,z)));}
+function F(m){
+  m=m||mode;
+  if(!S.f[m]) S.f[m]={zones:null,types:[],prices:[]};
+  const f=S.f[m];
+  if(!Array.isArray(f.zones)) f.zones=zoneKeysOf(m);
+  if(!Array.isArray(f.types)) f.types=[];
+  if(!Array.isArray(f.prices)) f.prices=[];
+  return f;
+}
+function recentIds(){
+  if(!S.recentDays) return new Set();
+  const cut=Date.now()-S.recentDays*86400000;
+  return new Set(S.history.filter(h=>h.ts>=cut).map(h=>h.id));
+}
+function pool(){
+  const f=F(),zs=new Set(f.zones),ex=new Set(S.excluded),rec=recentIds();
+  return shops().filter(s=>{
+    if(ex.has(s.id)) return false;
+    if(!zs.has(zoneKey(s.district,s.zone))) return false;
+    if(f.types.length && !s.types.some(t=>f.types.includes(t))) return false;
+    if(f.prices.length && s.price && !f.prices.includes(s.price)) return false;
+    if(S.skipClosed && s.closed!==null && s.closed!==undefined && s.closed===todayIdx) return false;
+    if(rec.has(s.id)) return false;
+    return true;
+  });
+}
+
+/* ---------- UI helpers ---------- */
+function chip(label,pressed,onClick,count){
+  const b=document.createElement("button");
+  b.type="button";b.className="chip";b.setAttribute("aria-pressed",pressed?"true":"false");b.textContent=label;
+  if(count!==undefined){const n=document.createElement("span");n.className="n";n.textContent=count;b.appendChild(n);}
+  b.addEventListener("click",onClick);return b;
+}
+function renderZones(){
+  const box=$("zoneChips");box.innerHTML="";
+  const f=F(),sel=new Set(f.zones),counts={};
+  shops().forEach(s=>{if(!S.excluded.includes(s.id)){const k=zoneKey(s.district,s.zone);counts[k]=(counts[k]||0)+1;}});
+  zonesOf().forEach(g=>{
+    const div=document.createElement("div");div.className="district";
+    const lab=document.createElement("button");lab.type="button";lab.className="dlabel";lab.textContent="อ."+g.d;
+    lab.addEventListener("click",()=>{
+      const keys=g.z.map(z=>zoneKey(g.d,z)),allOn=keys.every(k=>sel.has(k));
+      f.zones=allOn?f.zones.filter(k=>!keys.includes(k)):[...new Set(f.zones.concat(keys))];update();
+    });
+    div.appendChild(lab);
+    const chips=document.createElement("div");chips.className="chips";
+    g.z.forEach(z=>{const k=zoneKey(g.d,z);
+      chips.appendChild(chip(z,sel.has(k),()=>{f.zones=sel.has(k)?f.zones.filter(x=>x!==k):f.zones.concat(k);update();},counts[k]||0));});
+    div.appendChild(chips);box.appendChild(div);
+  });
+}
+function renderTypes(){
+  const box=$("typeChips");box.innerHTML="";const f=F();
+  MODES[mode].types.forEach(t=>box.appendChild(chip(t,f.types.includes(t),()=>{f.types=f.types.includes(t)?f.types.filter(x=>x!==t):f.types.concat(t);update();})));
+}
+function renderPrices(){
+  const box=$("priceChips");box.innerHTML="";const f=F();
+  PRICES.forEach(p=>box.appendChild(chip(p.t+" บาท",f.prices.includes(p.v),()=>{f.prices=f.prices.includes(p.v)?f.prices.filter(x=>x!==p.v):f.prices.concat(p.v);update();})));
+}
+function renderSummary(){
+  const f=F(),all=zoneKeysOf(mode).length,on=f.zones.filter(k=>zoneKeysOf(mode).includes(k)).length;
+  const parts=["ย่าน "+(on===all?"ทั้งหมด":on+"/"+all),"ประเภท "+(f.types.length?f.types.length+" แบบ":"ทั้งหมด"),"งบ "+(f.prices.length?f.prices.length+" ช่วง":"ทั้งหมด")];
+  $("ftSum").textContent=parts.join(" · ");
+}
+$("zAll").addEventListener("click",()=>{F().zones=zoneKeysOf(mode);update();});
+$("zNone").addEventListener("click",()=>{F().zones=[];update();});
+$("tClear").addEventListener("click",()=>{F().types=[];update();});
+$("pClear").addEventListener("click",()=>{F().prices=[];update();});
+$("skipClosed").checked=!!S.skipClosed;
+$("skipClosed").addEventListener("change",e=>{S.skipClosed=e.target.checked;update();});
+$("recentDays").value=String(S.recentDays||0);
+$("recentDays").addEventListener("change",e=>{S.recentDays=+e.target.value;update();});
+function setFiltersOpen(v){S.fOpen=v;$("filters").classList.toggle("open",v);$("ftoggle").setAttribute("aria-expanded",v?"true":"false");}
+$("ftoggle").addEventListener("click",()=>{setFiltersOpen(!$("filters").classList.contains("open"));save();});
+setFiltersOpen(S.fOpen!==false);
+
+/* ---------- wheel ---------- */
+const cv=$("wheel"),ctx=cv.getContext("2d"),ptr=document.querySelector(".pointer"),wrapEl=document.querySelector(".wheel-wrap");
+let rot=0,spinning=false,items=[],itemsSig="",lastPick=null,winIdx=-1,winT0=0;
+const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let audio=null,lastTick=0;
+function ensureAudio(){
+  if(!S.sound) return;
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(!audio&&AC) audio=new AC();if(audio&&audio.state==="suspended") audio.resume();}catch(e){}
+}
+function tone(freq,start,len,vol,type){
+  const o=audio.createOscillator(),g=audio.createGain();
+  o.type=type||"sine";o.frequency.setValueAtTime(freq,start);
+  g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(0.0001,start+len);
+  o.connect(g);g.connect(audio.destination);o.start(start);o.stop(start+len+0.02);
+}
+function tickSound(){
+  if(!S.sound||!audio) return;
+  const now=performance.now();if(now-lastTick<35) return;lastTick=now;
+  try{const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();
+    const hi=mode==="wan"?2100:1500;
+    o.type="triangle";o.frequency.setValueAtTime(hi,t);o.frequency.exponentialRampToValueAtTime(hi/3,t+0.04);
+    g.gain.setValueAtTime(0.09,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+    o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+0.06);}catch(e){}
+}
+function winSound(){
+  if(!S.sound||!audio) return;
+  try{const t=audio.currentTime;
+    const notes=mode==="wan"?[783.99,987.77,1174.66,1567.98]:[523.25,659.25,783.99,1046.5];
+    notes.forEach((f,i)=>tone(f,t+i*0.09,0.45,0.09,"sine"));tone(notes[3],t+0.36,0.7,0.06,"triangle");}catch(e){}
+}
+function renderSound(){const b=$("soundBtn");b.setAttribute("aria-pressed",S.sound?"true":"false");b.textContent=S.sound?"🔊 เสียงเปิด":"🔇 เสียงปิด";}
+$("soundBtn").addEventListener("click",()=>{S.sound=!S.sound;save();renderSound();if(S.sound){ensureAudio();tickSound();}});
+renderSound();
+function tickPointer(){ptr.classList.remove("tick","land");void ptr.offsetWidth;ptr.classList.add("tick");}
+
+function segColor(i,n){
+  const C=MODES[mode].colors;let c=i%C.length;
+  if(i===n-1 && n>1 && c===0) c=2;
+  return C[c];
+}
+function fitText(t,max){
+  if(ctx.measureText(t).width<=max) return t;
+  let s=t;while(s.length>1 && ctx.measureText(s+"…").width>max) s=s.slice(0,-1);
+  return s+"…";
+}
+const backOut=t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+function slice(i,n,R,seg,o){
+  const a0=i*seg-Math.PI/2,col=segColor(i,n);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,a0,a0+seg);ctx.closePath();
+  ctx.fillStyle=col;ctx.fill();
+  if(o.dim){ctx.fillStyle="rgba(8,14,18,"+(0.5*o.dim)+")";ctx.fill();}
+  if(n>1&&!o.win){ctx.strokeStyle="rgba(255,255,255,.6)";ctx.lineWidth=1.5;ctx.stroke();}
+  if(o.win){ctx.save();ctx.shadowColor="rgba(255,214,120,.95)";ctx.shadowBlur=10+16*o.pulse;ctx.strokeStyle="#fff8e6";ctx.lineWidth=3+2*o.pulse;ctx.stroke();ctx.restore();}
+  ctx.save();ctx.rotate(a0+seg/2);
+  const fs=Math.max(10,Math.min(17,R*0.7*seg*0.55))*(o.win?1.08:1);
+  ctx.font=(o.win?"600 ":"500 ")+fs+"px Anuphan, 'Noto Sans Thai', sans-serif";
+  ctx.globalAlpha=o.dim?1-0.45*o.dim:1;
+  ctx.fillStyle=MODES[mode].dark[col]?"#2a0f1c":"#ffffff";
+  if(mode==="kao"&&MODES.kao.dark[col]) ctx.fillStyle="#2a1a05";
+  ctx.textAlign="right";ctx.textBaseline="middle";
+  ctx.fillText(fitText(items[i].name.replace(/\s*\(.*?\)\s*/g," ").trim(),R*0.58),R-12,0);
+  ctx.restore();
+}
+function draw(now){
+  now=now||performance.now();
+  const size=cv.clientWidth||300,dpr=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(size*dpr)){cv.width=Math.round(size*dpr);cv.height=Math.round(size*dpr);}
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);
+  const c=size/2,R=c-18,n=items.length;
+  if(!n){
+    ctx.beginPath();ctx.arc(c,c,R,0,Math.PI*2);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--chip");ctx.fill();
+    $("emptyMsg").hidden=false;bulbs(c,R,now);return;
+  }
+  $("emptyMsg").hidden=true;
+  const seg=Math.PI*2/n,hl=winIdx>=0&&!spinning&&winIdx<n;
+  const pop=hl?(reduce?1:Math.min(1,(now-winT0)/420)):0;
+  const pulse=hl?(reduce?0.6:0.5+0.5*Math.sin((now-winT0)/170)):0;
+  ctx.save();ctx.translate(c,c);ctx.rotate(rot);
+  for(let i=0;i<n;i++){if(hl&&i===winIdx) continue;slice(i,n,R,seg,{dim:hl?pop:0});}
+  if(hl) slice(winIdx,n,R+10*backOut(pop),seg,{win:true,pulse});
+  ctx.restore();
+  bulbs(c,R,now);
+}
+function bulbs(c,R,now){
+  const M=MODES[mode],nb=28,rr=R+9,phase=Math.floor(now/(spinning?70:520));
+  ctx.beginPath();ctx.arc(c,c,rr,0,Math.PI*2);ctx.lineWidth=13;ctx.strokeStyle=M.ring;ctx.stroke();
+  for(let k=0;k<nb;k++){
+    const a=k/nb*Math.PI*2,x=c+Math.cos(a)*rr,y=c+Math.sin(a)*rr,on=reduce?(k%2===0):((k+phase)%2===0);
+    ctx.save();if(on){ctx.shadowColor=M.bulb;ctx.shadowBlur=9;}
+    ctx.beginPath();ctx.arc(x,y,3.3,0,Math.PI*2);ctx.fillStyle=on?M.bulb:"rgba(255,255,255,.26)";ctx.fill();ctx.restore();
+  }
+}
+(function loop(now){draw(now);requestAnimationFrame(loop);})(performance.now());
+
+function indexAt(r,n){const a=((-r)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);return Math.min(n-1,Math.floor(a/(Math.PI*2/n)));}
+function rand(){try{const u=new Uint32Array(1);crypto.getRandomValues(u);return u[0]/4294967296;}catch(e){return Math.random();}}
+function lockModes(v){document.querySelectorAll(".mode").forEach(b=>b.disabled=v);}
+function spin(){
+  if(spinning||!items.length) return;
+  ensureAudio();spinning=true;winIdx=-1;lockModes(true);
+  const hub=$("spinBtn");hub.disabled=true;hub.textContent="ลุ้น…";
+  $("result").hidden=true;$("result").classList.remove("show");
+  const n=items.length,start=rot,back=reduce?0:0.42,windDur=reduce?0:380;
+  const turns=reduce?1:5+Math.floor(rand()*3),from=start-back,target=start+turns*Math.PI*2+rand()*Math.PI*2;
+  const dur=reduce?450:4600,t0=performance.now(),ease=t=>1-Math.pow(1-t,4);
+  let lastIdx=indexAt(rot,n);
+  function step(now){
+    const e=now-t0;let done=false;
+    if(e<windDur) rot=start-back*Math.sin((e/windDur)*Math.PI/2);
+    else{const t=Math.min(1,(e-windDur)/dur);rot=from+(target-from)*ease(t);done=t>=1;}
+    const idx=indexAt(rot,n);
+    if(idx!==lastIdx){lastIdx=idx;if(!reduce)tickPointer();tickSound();}
+    if(!done){requestAnimationFrame(step);return;}
+    rot=target%(Math.PI*2);spinning=false;lockModes(false);
+    winIdx=indexAt(rot,n);winT0=performance.now();
+    hub.disabled=false;hub.textContent="หมุน!";
+    ptr.classList.remove("tick");void ptr.offsetWidth;ptr.classList.add("land");
+    showResult(items[winIdx]);winSound();confetti();update();
+  }
+  requestAnimationFrame(step);
+}
+function mapsUrl(s){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.name+" "+(s.zone===s.district?"":s.zone+" ")+s.district+" ระยอง");}
+function metaTags(box,s){
+  box.innerHTML="";
+  const add=t=>{const e=document.createElement("span");e.className="tag";e.textContent=t;box.appendChild(e);};
+  add(s.zone===s.district?"อ."+s.district:s.zone+" · อ."+s.district);
+  s.types.forEach(add);add(PRICE_TXT[s.price||0]);
+  if(s.closed!==null&&s.closed!==undefined) add("หยุดวัน"+DAYS[s.closed]);
+}
+function showResult(s){
+  lastPick=s;
+  $("rEyebrow").textContent=MODES[mode].eyebrow;
+  $("rName").textContent=s.name;metaTags($("rMeta"),s);$("rNote").textContent=s.note||"";
+  $("mapLink").href=mapsUrl(s);
+  const go=$("goBtn");go.disabled=false;go.textContent="ตกลง ไปร้านนี้";go.classList.remove("done");
+  const r=$("result");r.hidden=false;r.classList.remove("show");void r.offsetWidth;r.classList.add("show");
+}
+
+/* confetti: rice + chili for savory, sprinkles for dessert */
+const fx=document.createElement("canvas");fx.className="fx";fx.setAttribute("aria-hidden","true");document.body.appendChild(fx);
+const fctx=fx.getContext("2d");let parts=[],fxRunning=false;
+function confetti(){
+  if(reduce) return;
+  const dpr=window.devicePixelRatio||1,W=window.innerWidth,H=window.innerHeight;
+  fx.width=W*dpr;fx.height=H*dpr;fctx.setTransform(dpr,0,0,dpr,0,0);
+  const b=cv.getBoundingClientRect(),ox=b.left+b.width/2,oy=b.top+b.height*0.18;
+  const M=MODES[mode],pastel=["#f7c3d5","#86d3bd","#f4be66","#b994de","#ffffff","#d43f78"];
+  for(let i=0;i<150;i++){
+    const a=-Math.PI/2+(rand()-0.5)*Math.PI*1.25,sp=5+rand()*9;let kind,w,h,col;
+    if(mode==="kao"){
+      kind=rand()<0.3?"grain":(rand()<0.5?"chili":"paper");
+      w=kind==="grain"?7:(kind==="chili"?12:5+rand()*6);h=kind==="grain"?3.2:(kind==="chili"?3.6:4+rand()*4);
+      col=kind==="grain"?"#fbf7ec":(kind==="chili"?(rand()<0.6?"#c1121f":"#2f8f46"):M.colors.concat(["#ffd166"])[Math.floor(rand()*7)]);
+    }else{
+      kind=rand()<0.55?"sprinkle":(rand()<0.6?"dot":"heart");
+      w=kind==="sprinkle"?10:(kind==="dot"?6:11);h=kind==="sprinkle"?3:w;col=pastel[Math.floor(rand()*pastel.length)];
+    }
+    parts.push({x:ox,y:oy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,rot:rand()*6.3,vr:(rand()-0.5)*0.35,w,h,col,kind,life:0,max:110+rand()*70,sway:rand()*6.3});
+  }
+  if(!fxRunning){fxRunning=true;requestAnimationFrame(fxStep);}
+}
+function heart(s){fctx.beginPath();fctx.moveTo(0,s*0.3);fctx.bezierCurveTo(-s*0.6,-s*0.15,-s*0.3,-s*0.6,0,-s*0.25);fctx.bezierCurveTo(s*0.3,-s*0.6,s*0.6,-s*0.15,0,s*0.3);fctx.fill();}
+function fxStep(){
+  const W=window.innerWidth,H=window.innerHeight;fctx.clearRect(0,0,W,H);
+  parts=parts.filter(p=>p.life<p.max&&p.y<H+40);
+  parts.forEach(p=>{
+    p.life++;p.vy+=0.22;p.vx*=0.985;p.vy*=0.985;p.sway+=0.12;p.x+=p.vx+Math.sin(p.sway)*0.6;p.y+=p.vy;p.rot+=p.vr;
+    fctx.save();fctx.globalAlpha=Math.min(1,(p.max-p.life)/30);fctx.translate(p.x,p.y);fctx.rotate(p.rot);fctx.fillStyle=p.col;
+    if(p.kind==="paper"){fctx.scale(1,Math.abs(Math.cos(p.sway)));fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);}
+    else if(p.kind==="sprinkle"){fctx.beginPath();if(fctx.roundRect)fctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,p.h/2);else fctx.rect(-p.w/2,-p.h/2,p.w,p.h);fctx.fill();}
+    else if(p.kind==="heart"){heart(p.w);}
+    else{fctx.beginPath();fctx.ellipse(0,0,p.w/2,p.h/2,0,0,Math.PI*2);fctx.fill();
+      if(p.kind==="grain"){fctx.strokeStyle="rgba(120,100,60,.35)";fctx.lineWidth=0.6;fctx.stroke();}}
+    fctx.restore();
+  });
+  if(parts.length) requestAnimationFrame(fxStep);else{fxRunning=false;fctx.clearRect(0,0,W,H);}
+}
+$("spinBtn").addEventListener("click",spin);
+$("againBtn").addEventListener("click",spin);
+$("goBtn").addEventListener("click",()=>{
+  if(!lastPick) return;
+  S.history.unshift({id:lastPick.id,name:lastPick.name,zone:lastPick.zone,mode:lastPick.mode,ts:Date.now()});
+  S.history=S.history.slice(0,60);
+  const go=$("goBtn");go.disabled=true;go.textContent="✓ บันทึกแล้ว ขอให้อร่อย";go.classList.add("done");
+  update();
+});
+window.addEventListener("resize",()=>draw());
+
+/* ---------- shop list ---------- */
+function renderList(){
+  const box=$("shopList");box.innerHTML="";
+  const sel=new Set(F().zones),ex=new Set(S.excluded);
+  const groups=zonesOf().flatMap(g=>g.z.map(z=>({d:g.d,z}))).filter(g=>sel.has(zoneKey(g.d,g.z)));
+  if(!groups.length){box.innerHTML='<p class="hint">ยังไม่ได้เลือกย่าน เลือกย่านในตัวกรองเพื่อดูรายชื่อร้าน</p>';return;}
+  groups.forEach(g=>{
+    const list=shops().filter(s=>s.district===g.d&&s.zone===g.z);
+    const blk=document.createElement("div");blk.className="zone-block";
+    const h=document.createElement("p");h.className="zone-title";h.textContent=(g.z===g.d?"อ."+g.d:g.z+" · อ."+g.d)+" ("+list.length+")";blk.appendChild(h);
+    list.forEach(s=>{
+      const row=document.createElement("div");row.className="shop"+(ex.has(s.id)?" off":"");
+      const cb=document.createElement("input");cb.type="checkbox";cb.id="cb-"+s.id;cb.checked=!ex.has(s.id);
+      cb.setAttribute("aria-label","ใส่ "+s.name+" ในวงล้อ");
+      cb.addEventListener("change",()=>{S.excluded=cb.checked?S.excluded.filter(x=>x!==s.id):S.excluded.concat(s.id);update();});
+      const mid=document.createElement("div");
+      const nm=document.createElement("label");nm.className="sname";nm.htmlFor=cb.id;nm.textContent=s.name;
+      if(s.id[0]==="u"){const m=document.createElement("span");m.className="mine";m.textContent="ของฉัน";nm.appendChild(m);}
+      const meta=document.createElement("div");meta.className="meta";meta.style.marginTop="2px";
+      s.types.forEach(t=>{const e=document.createElement("span");e.className="tag";e.textContent=t;meta.appendChild(e);});
+      const pr=document.createElement("span");pr.textContent=PRICE_TXT[s.price||0];meta.appendChild(pr);
+      if(s.closed!==null&&s.closed!==undefined){const cl=document.createElement("span");cl.textContent="· หยุดวัน"+DAYS[s.closed];if(s.closed===todayIdx)cl.className="err";meta.appendChild(cl);}
+      mid.appendChild(nm);mid.appendChild(meta);
+      if(s.note&&s.note!==s.zone&&s.note!==s.district){const nt=document.createElement("div");nt.className="note";nt.textContent=s.note;mid.appendChild(nt);}
+      const side=document.createElement("div");side.className="side-act";
+      const a=document.createElement("a");a.className="btn sm ghost";a.href=mapsUrl(s);a.target="_blank";a.rel="noopener";a.textContent="แผนที่ ↗";side.appendChild(a);
+      if(s.id[0]==="u"){
+        const del=document.createElement("button");del.type="button";del.className="btn sm";del.textContent="ลบ";
+        del.addEventListener("click",()=>{
+          if(del.dataset.confirm){S.custom=S.custom.filter(x=>x.id!==s.id);update();}
+          else{del.dataset.confirm="1";del.textContent="กดอีกครั้งเพื่อลบ";del.classList.add("err");}
+        });
+        side.appendChild(del);
+      }
+      row.appendChild(cb);row.appendChild(mid);row.appendChild(side);blk.appendChild(row);
+    });
+    box.appendChild(blk);
+  });
+}
+
+/* ---------- add form ---------- */
+DISTRICTS.forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=d;$("fDistrict").appendChild(o);});
+DAYS.forEach((d,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent="วัน"+d;$("fClosed").appendChild(o);});
+let fMode=mode,fTypes=[];
+function renderForm(){
+  const mb=$("fMode");mb.innerHTML="";
+  ["kao","wan"].forEach(m=>mb.appendChild(chip(MODES[m].label,fMode===m,()=>{fMode=m;fTypes=[];renderForm();})));
+  const box=$("fTypes");box.innerHTML="";
+  MODES[fMode].types.forEach(t=>box.appendChild(chip(t,fTypes.includes(t),()=>{fTypes=fTypes.includes(t)?fTypes.filter(x=>x!==t):fTypes.concat(t);renderForm();})));
+  renderZoneList();
+}
+function renderZoneList(){
+  const d=$("fDistrict").value,dl=$("zoneList");dl.innerHTML="";
+  const set=new Set();["kao","wan"].forEach(m=>{const g=zonesOf(m).find(x=>x.d===d);if(g) g.z.forEach(z=>set.add(z));});
+  if(!set.size) set.add(d);
+  set.forEach(z=>{const o=document.createElement("option");o.value=z;dl.appendChild(o);});
+}
+$("fDistrict").addEventListener("change",renderZoneList);
+$("addForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("fName").value.trim(),msg=$("addMsg");
+  if(!name){msg.textContent="ใส่ชื่อร้านก่อนนะ";msg.classList.add("err");$("fName").focus();return;}
+  const district=$("fDistrict").value,zone=$("fZone").value.trim()||district;
+  const shop={id:"u"+Date.now().toString(36),mode:fMode,name,district,zone,types:fTypes.length?fTypes.slice():[MODES[fMode].types[fMode==="kao"?1:0]],
+    price:+$("fPrice").value,note:$("fNote").value.trim(),closed:$("fClosed").value===""?null:+$("fClosed").value};
+  S.custom.push(shop);
+  const f=F(fMode),k=zoneKey(district,zone);if(!f.zones.includes(k)) f.zones.push(k);
+  msg.classList.remove("err");msg.textContent="เพิ่ม \""+name+"\" ในหมวด"+MODES[fMode].label+" ย่าน "+zone+" แล้ว";
+  $("fName").value="";$("fNote").value="";fTypes=[];renderForm();
+  update();
+});
+
+/* ---------- import / export ---------- */
+function refreshExport(){
+  $("exportBox").value=JSON.stringify(S.custom.map(s=>({name:s.name,mode:s.mode,district:s.district,zone:s.zone,types:s.types,price:s.price,note:s.note,closed:s.closed})));
+}
+$("copyBtn").addEventListener("click",()=>{
+  const v=$("exportBox").value,m=$("ioMsg");
+  const fallback=()=>{$("exportBox").select();m.textContent="ข้อความถูกเลือกไว้แล้ว กด Ctrl+C / ⌘C";};
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(()=>{m.classList.remove("err");m.textContent="คัดลอกแล้ว";},fallback);
+  else fallback();
+});
+$("importBtn").addEventListener("click",()=>{
+  const m=$("ioMsg");
+  try{
+    const arr=JSON.parse($("importBox").value);if(!Array.isArray(arr)) throw new Error();
+    let added=0;
+    arr.forEach((r,i)=>{
+      if(!r||typeof r.name!=="string"||!r.name.trim()) return;
+      const md=r.mode==="wan"?"wan":"kao";
+      const district=typeof r.district==="string"&&r.district?r.district:"เมืองระยอง";
+      const zone=typeof r.zone==="string"&&r.zone?r.zone:district;
+      if(S.custom.some(s=>s.name===r.name&&s.zone===zone&&s.mode===md)) return;
+      const types=Array.isArray(r.types)?r.types.filter(t=>MODES[md].types.includes(t)):[];
+      S.custom.push({id:"u"+Date.now().toString(36)+i,mode:md,name:r.name.trim(),district,zone,
+        types:types.length?types:[MODES[md].types[md==="kao"?1:0]],
+        price:[0,1,2,3].includes(r.price)?r.price:0,note:typeof r.note==="string"?r.note:"",
+        closed:Number.isInteger(r.closed)&&r.closed>=0&&r.closed<7?r.closed:null});
+      const f=F(md),k=zoneKey(district,zone);if(!f.zones.includes(k)) f.zones.push(k);
+      added++;
+    });
+    m.classList.remove("err");m.textContent="นำเข้า "+added+" ร้าน";$("importBox").value="";update();
+  }catch(e){m.classList.add("err");m.textContent="อ่านข้อมูลไม่ได้ ตรวจว่าวางข้อความที่คัดลอกมาครบทั้งหมด";}
+});
+
+/* ---------- history ---------- */
+function renderHist(){
+  const ul=$("histList");ul.innerHTML="";
+  if(!S.history.length){ul.innerHTML='<li><span class="hint">ยังไม่มีประวัติ หมุนแล้วกด "ตกลง ไปร้านนี้" เพื่อบันทึก</span></li>';return;}
+  S.history.slice(0,20).forEach(h=>{
+    const li=document.createElement("li"),d=new Date(h.ts),s=document.createElement("span");
+    const mt=document.createElement("span");mt.className="mtag";mt.textContent=MODES[h.mode==="wan"?"wan":"kao"].label;s.appendChild(mt);
+    s.appendChild(document.createTextNode(h.name+(h.zone?" · "+h.zone:"")));
+    const t=document.createElement("time");t.dateTime=d.toISOString();
+    t.textContent="วัน"+DAYS[d.getDay()]+" "+d.getDate()+"/"+(d.getMonth()+1)+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    li.appendChild(s);li.appendChild(t);ul.appendChild(li);
+  });
+}
+$("histClear").addEventListener("click",()=>{S.history=[];update();});
+
+/* ---------- tabs ---------- */
+["list","add","hist"].forEach(t=>$("tab-"+t).addEventListener("click",()=>{
+  ["list","add","hist"].forEach(x=>{$("tab-"+x).setAttribute("aria-selected",x===t?"true":"false");$("pane-"+x).hidden=x!==t;});
+}));
+
+/* ---------- mode switching ---------- */
+function applyMode(animate){
+  const M=MODES[mode];
+  document.documentElement.setAttribute("data-mode",mode);
+  document.title=(mode==="wan"?"ของหวานร้านไหนดี":"เที่ยงนี้กินไหน")+" ระยอง";
+  $("title").innerHTML=M.title;$("sub").textContent=M.sub;$("typeHead").textContent=M.typeHead;
+  $("logo").innerHTML=LOGO[mode];
+  ["kao","wan"].forEach(m=>{const b=$("m-"+m);if(m===mode)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
+  $("result").hidden=true;$("result").classList.remove("show");
+  winIdx=-1;itemsSig="";
+  if(animate&&!reduce){cv.classList.remove("swap");void cv.offsetWidth;cv.classList.add("swap");}
+  fMode=mode;fTypes=[];renderForm();
+}
+function setMode(m,animate){
+  if(spinning||(m!=="kao"&&m!=="wan")) return;
+  const changed=m!==mode;mode=m;S.mode=m;
+  applyMode(changed&&animate);update();
+}
+document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{
+  const m=b.dataset.m;if(m===mode) return;
+  if(location.hash!=="#"+m) location.hash=m; else setMode(m,true);
+}));
+window.addEventListener("hashchange",()=>{const m=location.hash.slice(1);if(m==="kao"||m==="wan") setMode(m,true);});
+
+/* ---------- update ---------- */
+function update(){
+  save();
+  if(!spinning){const ni=pool(),sig=mode+":"+ni.map(x=>x.id).join(",");if(sig!==itemsSig){items=ni;itemsSig=sig;winIdx=-1;}}
+  const total=shops().length;
+  $("poolLine").innerHTML="";
+  const b=document.createElement("b");b.textContent=items.length;
+  $("poolLine").append("วงล้อมี ",b," ร้าน จาก"+MODES[mode].label+"ทั้งหมด "+total+" ร้าน");
+  $("spinBtn").disabled=spinning||!items.length;
+  $("c-kao").textContent=shops("kao").length;$("c-wan").textContent=shops("wan").length;
+  $("tab-list").textContent="รายชื่อร้าน ("+total+")";
+  renderZones();renderTypes();renderPrices();renderSummary();renderList();renderHist();refreshExport();
+}
+applyMode(false);
+update();
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>draw());
+})();
+</script>
+</body>
+</html>
